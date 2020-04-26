@@ -98,7 +98,7 @@ let massive_config = {
   database: DATABASE_NAME,
   user: DATABASE_USERNAME,
   password: DATABASE_PASSWORD,
-  ssl: true
+  ssl: false
 };
 if (NODE_ENV === "production") {
   massive_config.ssl = {
