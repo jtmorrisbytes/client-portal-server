@@ -19,11 +19,11 @@ jobs:
       env:
         CI: true
         NODE_ENV: test
-        DATABASE_USERNAME: $[{ secrets.DATABASE_USERNAME }]
-        DATABASE_PASSWORD: $[{ secrets.DATABASE_PASSWORD }]
-        DATABASE_PORT: $[{ secrets.DATABASE_PORT }]
-        DATABASE_HOST: $[{ secrets.DATABASE_HOST }]
-        REDIS_HOST: $[{ secrets.REDIS_HOST }]
-        REDIS_USERNAME: $[{ secrets.REDIS_HOST }]
-        REDIS_PASSWORD: $[{ secrets.REDIS_HOST }]
-        NIST_TOKEN: $[{ secrets.NIST_TOKEN }]
+        DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+        DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+        DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+        DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+        REDIS_HOST: ${{ secrets.REDIS_HOST }}
+        REDIS_USERNAME: ${{ secrets.REDIS_HOST }}
+        REDIS_PASSWORD: ${{ secrets.REDIS_HOST }}
+        NIST_TOKEN: ${{ secrets.NIST_TOKEN }}
