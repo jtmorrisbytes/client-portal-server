@@ -17,7 +17,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: "Run Unit Tests"
         uses: actions/setup-node@v1
-        node-version: "12.x"
+        wtih:
+          node-version: "12.x"
       - run: npm ci
       - run: npm test
         env:
