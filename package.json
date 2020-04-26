@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "set NODE_ENV=test && jasmine",
+    "test": "set NODE_ENV=test && npx jasmine",
     "test:watch": "nodemon --watch spec/** --exec \"npm run test\"",
     "start:dev": "set NODE_ENV=development &&  node index.js ",
     "watch:dev": "nodemon --watch src --exec \"npm run start:dev\"",
@@ -40,6 +40,7 @@
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
     "babel-loader": "^8.1.0",
+    "jasmine": "^3.5.0",
     "supertest": "^4.0.2",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
