@@ -1,33 +1,29 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: Node.js CI
 
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+on: [push]
 
 jobs:
-  test:
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: "Run Unit Tests"
-        uses: actions/setup-node@v1
-        wtih:
-          node-version: "12.x"
-      - run: npm ci
-      - run: npm test
-        env:
-          NODE_ENV: test
-          DATABASE_USERNAME: $[{ secrets.DATABASE_USERNAME }]
-          DATABASE_PASSWORD: $[{ secrets.DATABASE_PASSWORD }]
-          DATABASE_PORT: $[{ secrets.DATABASE_PORT }]
-          DATABASE_HOST: $[{ secrets.DATABASE_HOST }]
-          REDIS_HOST: $[{ secrets.REDIS_HOST }]
-          REDIS_USERNAME: $[{ secrets.REDIS_HOST }]
-          REDIS_PASSWORD: $[{ secrets.REDIS_HOST }]
-          NIST_TOKEN: $[{ secrets.NIST_TOKEN }]
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm install
+    - run: npm run build --if-present
+    - run: npm test
+      env:
+        CI: true
+        NODE_ENV: test
+        DATABASE_USERNAME: $[{ secrets.DATABASE_USERNAME }]
+        DATABASE_PASSWORD: $[{ secrets.DATABASE_PASSWORD }]
+        DATABASE_PORT: $[{ secrets.DATABASE_PORT }]
+        DATABASE_HOST: $[{ secrets.DATABASE_HOST }]
+        REDIS_HOST: $[{ secrets.REDIS_HOST }]
+        REDIS_USERNAME: $[{ secrets.REDIS_HOST }]
+        REDIS_PASSWORD: $[{ secrets.REDIS_HOST }]
+        NIST_TOKEN: $[{ secrets.NIST_TOKEN }]
