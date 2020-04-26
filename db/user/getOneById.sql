@@ -1,0 +1,1 @@
+SELECT users_id, first_name, last_name, hash, email, street_address, city, state, zip = require( users where users_id = $1;

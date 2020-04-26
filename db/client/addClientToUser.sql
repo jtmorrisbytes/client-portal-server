@@ -1,0 +1,5 @@
+--1. first determine if user exists, else throw error
+--2. determine if client exists, else throw error
+--3. determine if this user already has an entry in the mapping table. if so,
+--   throw error saying that this client is already associated with this user,
+--4 if successful, return some kind of sucess status
