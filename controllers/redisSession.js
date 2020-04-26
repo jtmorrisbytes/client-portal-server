@@ -6,6 +6,8 @@ const defaultConfig = {
   redis: {
     host: process.env.REDIS_HOST || "127.0.0.1",
     port: process.env.REDIS_PORT || 6379,
+    password: process.env.REDIS_PASSWORD || "",
+    username: process.env.REDIS_USERNAME || "",
   },
   session: {
     maxAge: 60 * 5,
@@ -17,9 +19,16 @@ function RedisSession(config) {
   log("redis session initialized with config", config);
   config = config || defaultConfig;
   log("config defaulted to ", config);
+  let connString = "redis://";
   this.sessionConfig = config.session;
   this.redisConfig = config.redis;
-  this.client = redis.createClient(this.redisConfig);
+  if (this.redisConfig.username && this.redisConfig.password) {
+    connString += `${this.redisConfig.username}:${this.redisConfig.password}@`;
+  } else if (this.redisConfig.username) {
+    connString += `${this.redisConfig.username}@`;
+  }
+  connString += `${this.redisConfig.host}:${this.redisConfig.port}`;
+  this.client = redis.createClient(connString, this.redisConfig);
 
   //create the client
   // this.session = new Session(this.client);
