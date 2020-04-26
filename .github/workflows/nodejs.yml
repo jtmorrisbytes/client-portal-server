@@ -13,9 +13,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: "Install Dependencies"
-        run: npm ci
-      - name: "Run Tests with Jasmine"
+      - name: "Run Unit Tests"
+        uses: actions/setup-node@v1
+        wtih:
+          node-version: "12.x"
+      - run: npm ci
+      - run: npm test
         env:
           NODE_ENV: test
           DATABASE_USERNAME: $[{ secrets.DATABASE_USERNAME }]
@@ -26,4 +29,3 @@ jobs:
           REDIS_USERNAME: $[{ secrets.REDIS_HOST }]
           REDIS_PASSWORD: $[{ secrets.REDIS_HOST }]
           NIST_TOKEN: $[{ secrets.NIST_TOKEN }]
-        run: npm test
