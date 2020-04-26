@@ -79,12 +79,6 @@ app.use(
   })
 );
 // https security options
-const httpsOpts = {
-  key: fs.readFileSync("privkey.pem"),
-  cert: fs.readFileSync("fullchain.pem"),
-  secureOptions: constants.SSL_OP_NO_SSLv3,
-  // ca: [fs.readFileSync("chain.pem")],
-};
 
 // use express.json as json parser
 app.use(express.json());
@@ -127,9 +121,19 @@ async function main() {
     app.use(express.static(path.join("..", "public")));
   }
   if (NODE_ENV.includes("dev") || NODE_ENV.includes("prod")) {
-    https.createServer(httpsOpts, app).listen(SERVER_PORT, SERVER_HOST, () => {
-      log(`SERVER LISTENING on ${SERVER_HOST}:${SERVER_PORT}`);
-    });
+    https
+      .createServer(
+        {
+          key: fs.readFileSync("privkey.pem"),
+          cert: fs.readFileSync("fullchain.pem"),
+          secureOptions: constants.SSL_OP_NO_SSLv3,
+          // ca: [fs.readFileSync("chain.pem")],
+        },
+        app
+      )
+      .listen(SERVER_PORT, SERVER_HOST, () => {
+        log(`SERVER LISTENING on ${SERVER_HOST}:${SERVER_PORT}`);
+      });
   } else {
     return await app.listen(SERVER_PORT, SERVER_HOST);
   }
