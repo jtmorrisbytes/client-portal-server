@@ -26,4 +26,4 @@ jobs:
           REDIS_USERNAME: $[{ secrets.REDIS_HOST }]
           REDIS_PASSWORD: $[{ secrets.REDIS_HOST }]
           NIST_TOKEN: $[{ secrets.NIST_TOKEN }]
-          run: npm test
+        run: npm test
