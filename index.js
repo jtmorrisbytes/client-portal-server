@@ -4,7 +4,6 @@ const path = require("path");
 const fs = require("fs");
 const morgan = require("morgan");
 const massive = require("massive");
-const session = require("express-session");
 const cookieparser = require("cookie-parser");
 const helmet = require("helmet");
 const https = require("https");
