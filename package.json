@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/runtime": "^7.9.2",
     "@jtmorrisbytes/lib": "0.0.1",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
@@ -25,8 +24,6 @@
     "deep-equal": "^2.0.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "forever": "^2.0.0",
     "helmet": "^3.22.0",
     "massive": "^6.3.0",
     "morgan": "^1.10.0",
@@ -35,15 +32,8 @@
     "sha1": "^1.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/plugin-transform-async-to-generator": "^7.8.3",
-    "@babel/plugin-transform-runtime": "^7.9.0",
-    "@babel/preset-env": "^7.9.5",
     "babel-loader": "^8.1.0",
     "jasmine": "^3.5.0",
-    "supertest": "^4.0.2",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11",
-    "webpack-node-externals": "^1.7.2"
+    "supertest": "^4.0.2"
   }
 }
