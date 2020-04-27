@@ -24,6 +24,9 @@ const {
   MAX_ELAPSED_REQUEST_TIME,
 } = constants;
 const { NIST } = PASSWORD;
+function getSession(req, res) {
+  res.json(req.session || {});
+}
 async function register(req, res) {
   // try to destructure, respond with 500 if it fails
   try {
