@@ -30,7 +30,7 @@ async function main() {
   }
   let db = await massive(config);
   console.log("running seed script");
-  await db.seed();
+  await db.seed(DATABASE_NAME);
   console.log("seed successful, exiting");
   process.exit(0);
 }

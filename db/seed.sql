@@ -1,3 +1,5 @@
+CREATE DATABASE $1;
+
 create table setting (
 setting_id int primary key
 );
@@ -16,8 +18,6 @@ create table users (
   zip text
 );
 
-
-drop table if exists client;
 create table client (
   client_id serial Primary Key,
   email varchar(254) UNIQUE NOT NULL,
