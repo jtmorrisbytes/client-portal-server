@@ -1,4 +1,6 @@
-DROP TABLE IF EXISTS users_client;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS users_client CASCADE;
+DROP TABLE IF EXISTS client CASCADE;
 drop table if exists setting;
 create table setting (
 setting_id int primary key
