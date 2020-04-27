@@ -71,16 +71,17 @@ async function main(db) {
   let server = http.createServer(app);
   if (NODE_ENV === "production") {
     console.log("launching server in production");
+    let SSL_OPTS = {
+      key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
+      cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
+      secureOptions: constants.SSL_OP_NO_SSLv3,
+      // ca: [fs.readFileSync("chain.pem")],
+    };
+    if (SSL_CA) {
+      SSL_OPTS.ca = [fs.readFileSync(SSL_CA)];
+    }
     return await https
-      .createServer(
-        {
-          key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
-          cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
-          secureOptions: constants.SSL_OP_NO_SSLv3,
-          // ca: [fs.readFileSync("chain.pem")],
-        },
-        app
-      )
+      .createServer(SSL_OPTS, app)
       .listen(SERVER_PORT, SERVER_HOST);
   } else if (NODE_ENV === "development") {
     console.log("launching server in development");
