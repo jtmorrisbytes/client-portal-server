@@ -50,7 +50,7 @@ jobs:
           DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
           DATABASE_PASSWORD: postgres
           DATABASE_USERNAME: postgres
-          DATABASE_NAME: ${{ job.services.postgres.env.POSTGRES_DB }}
+          DATABASE_NAME: ${{ job.services.postgres.env.POSTGRES_DB}}
           REDIS_HOST: redis
           REDIS_PORT: ${{ job.services.redis.ports[6379]}}
           NODE_ENV: test
