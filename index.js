@@ -92,8 +92,7 @@ async function main(db) {
 }
 if (NODE_ENV === "production" || NODE_ENV === "development") {
   main().then((server) => {
-    console.log("server listening");
-    console.dir(server);
+    console.log(`server listening on ${SERVER_HOST}:${SERVER_PORT}`);
   });
 } else {
   module.exports = main;
