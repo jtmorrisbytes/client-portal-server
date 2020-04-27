@@ -42,8 +42,9 @@ jobs:
         # If we were running the job on the VM this would be localhost
         DATABASE_HOST: postgres
         DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
-        DATBASE_PASSWORD: postgres
+        DATABASE_PASSWORD: postgres
         DATABASE_USERNAME: postgres
+
         REDIS_HOST: redis
         REDIS_PORT: ${{ job.services.redis.ports[6379]}}
         NODE_ENV: test
