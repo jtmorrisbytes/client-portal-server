@@ -46,3 +46,4 @@ jobs:
         DATABASE_USERNAME: ${{ job.services.postgres.env.POSTGRES_USER}}
         REDIS_HOST: redis
         REDIS_PORT: ${{ job.services.redis.ports[6379]}}
+        NODE_ENV: test
