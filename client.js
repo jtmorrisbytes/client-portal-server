@@ -28,10 +28,15 @@ async function main() {
       rejectUnauthorized: false,
     };
   }
-  let db = await massive(config);
-  console.log("running seed script");
-  await db.seed(DATABASE_NAME);
-  console.log("seed successful, exiting");
+  try {
+    let db = await massive(config);
+    console.log("running seed script");
+    await db.seed(DATABASE_NAME);
+    console.log("seed successful, exiting");
+  } catch (e) {
+    console.error(e);
+    process.exit(-1);
+  }
   process.exit(0);
 }
 main();

@@ -1,3 +1,4 @@
+const fs = require("fs");
 let {
   DATABASE_USERNAME,
   DATABASE_PASSWORD,
