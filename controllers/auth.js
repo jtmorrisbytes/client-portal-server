@@ -1,3 +1,5 @@
+// @flow
+
 const {
   validateEmail,
   validatePassword,
@@ -6,7 +8,11 @@ const {
 const bcrypt = require("bcryptjs");
 const axios = require("axios");
 const sha1 = require("sha1");
-const inspect = require("util").inpect;
+const inspect =
+  require("util").inpect ||
+  ((o) => {
+    o;
+  });
 const crypto = require("crypto");
 const {
   MESSAGE_NOT_AUTHORIZED,
@@ -101,7 +107,6 @@ async function register(req, res) {
     );
     let user = result[0];
     log("/api/auth/register DB create user result", user);
-    await req.session.create();
     req.session.user = {
       id: user.users_id,
     };
@@ -114,14 +119,15 @@ async function register(req, res) {
       error: e,
     };
     if (e instanceof SyntaxError) {
-      process.stdout.write("because of a syntax error");
+      process.stdout.write("because of a syntax error ");
       errRes.reason = REASON.ERROR.SYNTAX;
     } else if (e instanceof TypeError) {
-      process.stdout.write("because of a Type Error");
+      process.stdout.write("because of a Type Error ");
       errRes.reason = REASON.ERROR.TYPE;
     }
     res.status(500).json(errRes);
-    process.stdout.write("with stacktrace:\n" + inspect(e) + "\n");
+    process.stdout.write("with stacktrace:\n");
+    console.error(e);
   }
 }
 async function getSession(req, res) {
@@ -178,11 +184,10 @@ async function logIn(req, res) {
         );
         if (authenticated) {
           log("logging in user with id:", user.users_id);
-          await req.session.create();
-          req.session.user = {
+          (req.session.user = {
             id: user.users_id,
-          };
-          res.json({ session: req.session });
+          }),
+            res.json({ session: req.session });
         } else {
           console.warn("/api/auth/login recieved an invalid password");
           res.status(401).json({
@@ -213,6 +218,7 @@ async function logIn(req, res) {
 }
 async function logOut(req, res) {
   req.session.destroy();
+  req.clearCookie("connect.sid");
   res.sendStatus(200);
 }
 function getUser(req, res) {
@@ -224,22 +230,23 @@ function checkAuthState(req, res, next) {
   // const stateObj = req.app.get(req.query.state||req.body.state);
   // if(!stateObj)
   // const { timestamp, state, ipAddr } = auth || {};
-  log(
-    "Checkauthstate called. checking query and body",
-    req.query.state,
-    req.body.state
-  );
-  if (!req.query.state && !req.body.state) {
+  if (!req.body) {
+    res
+      .status(400)
+      .json({ message: MESSAGE_BAD_REQUEST, reason: "MISSING_REQUEST_BODY" });
+    return;
+  }
+  if (!req.body.state) {
     res.status(401).json({
       message: MESSAGE_NOT_AUTHORIZED,
       reason: REASON.AUTH.STATE_MISSING,
-      path: "query",
+      path: "body",
     });
     return;
   }
-  let state = req.app.get(req.query.state || req.body.state);
+  let state = req.app.get(req.body.state);
   if (!state) {
-    log(state, req.query.state);
+    log(state, req.body.state);
     res.status(401).json({
       message: MESSAGE_NOT_AUTHORIZED,
       reason: REASON.AUTH.STATE_NOT_FOUND,

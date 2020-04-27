@@ -1,4 +1,5 @@
 // do processing here
+const auth = require("../controllers/auth");
 const {
   logIn,
   logOut,
@@ -6,7 +7,7 @@ const {
   getUser,
   startAuthSession,
   checkAuthState,
-} = require("../controllers/auth");
+} = auth;
 
 const router = require("express").Router();
 const basePath = "/auth";
