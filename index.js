@@ -50,7 +50,7 @@ let sessionConfig = {
 if (NODE_ENV === "production") {
   sessionConfig.cookie.secure = true;
 }
-app.use(session(session));
+app.use(session(sessionConfig));
 
 app.use(express.json());
 // use morgan request logging
