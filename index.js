@@ -22,7 +22,15 @@ global.log =
       };
 global.debug =
   process.env.NODE_ENV === "production" ? function () {} : console.debug;
-let { SERVER_HOST, SERVER_PORT, NODE_ENV } = process.env;
+let {
+  SERVER_HOST,
+  SERVER_PORT,
+  NODE_ENV,
+  SSL_CERT,
+  SSL_KEY,
+  SSL_CA,
+  SESSION_SECRET,
+} = process.env;
 //normalize variables
 SERVER_HOST = SERVER_HOST || "127.0.0.1";
 SERVER_PORT = SERVER_PORT || 3000;
@@ -33,13 +41,16 @@ app.use(require("./configureHelmet"));
 // express-session
 const session = require("express-session");
 const SQLiteStore = require("connect-sqlite3")(session);
-app.use(
-  session({
-    store: new SQLiteStore(),
-    secret: "ABCDEFGH",
-    cookie: { maxAge: 1000 * 60 * 5 },
-  })
-);
+let sessionConfig = {
+  store: new SQLiteStore(),
+  secret: SESSION_SECRET,
+  cookie: { maxAge: 1000 * 60 * 5 },
+};
+
+if (NODE_ENV === "production") {
+  sessionConfig.cookie.secure = true;
+}
+app.use(session(session));
 
 app.use(express.json());
 // use morgan request logging
@@ -63,8 +74,8 @@ async function main(db) {
     return await https
       .createServer(
         {
-          key: fs.readFileSync("privkey.pem"),
-          cert: fs.readFileSync("fullchain.pem"),
+          key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
+          cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
           secureOptions: constants.SSL_OP_NO_SSLv3,
           // ca: [fs.readFileSync("chain.pem")],
         },
