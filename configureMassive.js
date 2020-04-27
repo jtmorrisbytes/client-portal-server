@@ -33,14 +33,14 @@ if (NODE_ENV === "production") {
   log(" for development\n");
 } else {
   log("for testing ");
-  if (CI == true) {
-    log("on CI\r\n");
-  } else {
-    log("on a local machine");
+  if (!CI) {
     config.ssl = {
       mode: true,
       rejectUnauthorized: false,
     };
+  } else {
+    log("on CI\r\n");
+    log("on a local machine");
   }
 }
 module.exports = config;
