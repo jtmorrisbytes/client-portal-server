@@ -36,6 +36,11 @@ jobs:
       - uses: actions/checkout@v1
       - run: npm ci
       - run: node client.js
+        env:
+          DATABASE_HOST: postgres
+          DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
+          DATABASE_PASSWORD: postgres
+          DATABASE_USERNAME: postgres
       - run: npm test
         env:
           # use postgres for the host here because we have specified a container for the job.

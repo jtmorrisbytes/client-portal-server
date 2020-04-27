@@ -15,7 +15,7 @@ async function main() {
     `connecting to postgres://${DATABASE_USERNAME}:****@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}`
   );
   let db = await massive({
-    host: DATABASE_HOST || "localhost",
+    host: DATABASE_HOST || "postgres",
     port: DATABASE_PORT || 5432,
     user: DATABASE_USERNAME || "postgres",
     database: DATABASE_NAME || "testdb",
