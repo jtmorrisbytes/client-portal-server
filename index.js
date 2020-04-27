@@ -44,7 +44,7 @@ const SQLiteStore = require("connect-sqlite3")(session);
 let sessionConfig = {
   store: new SQLiteStore(),
   secret: SESSION_SECRET,
-  cookie: { maxAge: 1000 * 60 * 5 },
+  cookie: { resave: false, saveUninitialized: false, maxAge: 1000 * 60 * 5 },
 };
 
 if (NODE_ENV === "production") {
