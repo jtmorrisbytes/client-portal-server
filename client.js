@@ -18,7 +18,7 @@ async function main() {
     host: DATABASE_HOST || "postgres",
     port: DATABASE_PORT || 5432,
     user: DATABASE_USERNAME || "postgres",
-    database: DATABASE_NAME || "testdb",
+    database: DATABASE_NAME || "postgres",
     password: DATABASE_PASSWORD || "",
     poolSize: 10,
   };
@@ -30,7 +30,7 @@ async function main() {
   }
   let db = await massive(config);
   console.log("running seed script");
-  await db.seed(DATABASE_NAME);
+  await db.seed();
   console.log("seed successful, exiting");
   process.exit(0);
 }

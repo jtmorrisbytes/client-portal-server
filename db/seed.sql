@@ -1,7 +1,3 @@
-DROP DATABASE IF EXISTS $1;
-CREATE DATABASE $1;
-
-
 create table setting (
 setting_id int primary key
 );
