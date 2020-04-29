@@ -2,7 +2,7 @@
 
 let request = require("supertest");
 async function startAuthSession(done, callback) {
-  let server = await require("../../index.js")();
+  let server = await require("../../src/index.js")();
   request(server)
     .post("/api/auth/")
     .expect("Content-Type", /json/)

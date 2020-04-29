@@ -58,7 +58,7 @@ app.use(express.json());
 // use morgan request logging
 app.use(morgan("dev"));
 // mount routes
-const routes = require("./routes/index.js");
+const routes = require("../routes/index.js");
 app.use(routes.rootPath, routes.router);
 
 // get massive config
