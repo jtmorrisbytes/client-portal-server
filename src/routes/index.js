@@ -6,7 +6,8 @@ const rootPath = process.env.API_ROOT || "/api";
 const routes = Router();
 
 // require routers
-const { enforceUserLoggedIn } = require("../controllers/enforceAuth");
+
+const { enforceUserLoggedIn } = require("../controllers/enforceAuth.ts");
 
 function postRequest(req, res) {
   console.log("this function ran after the request finished");

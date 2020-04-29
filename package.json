@@ -9,9 +9,10 @@
     "start:dev": "set NODE_ENV=development &&  node src/index.js ",
     "watch:dev": "nodemon --watch src --exec \"npm run start:dev\"",
     "start": "set NODE_ENV=production && nodemon",
-    "build": "rmdir /s /q dist && yarn webpack && build "
+    "build": "rmdir /s /q dist && yarn webpack --mode production && build "
   },
   "dependencies": {
+    "@jtmorrisbytes/lib": "^0.0.17",
     "jasmine": "^3.5.0",
     "supertest": "^4.0.2",
     "ts-loader": "^7.0.1",
