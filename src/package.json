@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "private": true,
@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@jtmorrisbytes/lib": "^0.0.18",
+    "@jtmorrisbytes/lib": "0.0.21",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^4.0.4",
