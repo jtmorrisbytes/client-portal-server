@@ -3,7 +3,7 @@ const externals = require("webpack-node-externals");
 module.exports = {
   entry: "./src/index.ts",
   target: "node",
-  externals: [externals()],
+  externals: [externals({ modulesDir: "./src/node_modules" }), "pg-native"],
   devtool: "inline-source-map",
   module: {
     rules: [

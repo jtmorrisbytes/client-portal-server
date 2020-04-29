@@ -9,7 +9,7 @@ const routes = Router();
 const { enforceUserLoggedIn } = require("../controllers/enforceAuth");
 
 function postRequest(req, res) {
-  log("this function ran after the request finished");
+  console.log("this function ran after the request finished");
 }
 
 const auth = require("./auth");

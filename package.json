@@ -17,6 +17,7 @@
     "webpack": "^4.43.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.6",
     "webpack-cli": "^3.3.11",
     "webpack-node-externals": "^1.7.2"
   }

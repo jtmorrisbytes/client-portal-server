@@ -22,26 +22,26 @@ let config = {
 };
 
 console.log(`configureMassive: NODE_ENV is ${NODE_ENV}, config is`, config);
-log(`Configuring massive `);
+console.log(`Configuring massive `);
 if (NODE_ENV === "production") {
-  log("for production\r\n");
+  console.log("for production\r\n");
   config.ssl = {
     mode: "require",
     // rejectUnauthorized: false,
     ca: fs.readFileSync("db.ca-certificate.crt"),
   };
 } else if (NODE_ENV === "development") {
-  log(" for development\n");
+  console.log(" for development\n");
 } else {
-  log("for testing ");
+  console.log("for testing ");
   if (!CI) {
     config.ssl = {
       mode: true,
       rejectUnauthorized: false,
     };
   } else {
-    log("on CI\r\n");
-    log("on a local machine");
+    console.log("on CI\r\n");
+    console.log("on a local machine");
   }
 }
 module.exports = config;
