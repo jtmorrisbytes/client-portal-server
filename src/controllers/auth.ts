@@ -8,7 +8,7 @@ import EMAIL, { Email } from "@jtmorrisbytes/lib/User/Email";
 // TODO: implement Password error utility classes
 import PASSWORD from "@jtmorrisbytes/lib/User/Password";
 
-import { Resource } from "@jtmorrisbytes/lib/Resource";
+import { Resource } from "@jtmorrisbytes/lib/Resource/";
 import { Name } from "@jtmorrisbytes/lib/User/Name";
 //TODO: allow reason to be passed in and create more specific messages for user
 import USER from "@jtmorrisbytes/lib/User";
