@@ -3,7 +3,10 @@ const externals = require("webpack-node-externals");
 module.exports = {
   entry: "./src/index.ts",
   target: "node",
-  externals: [externals({ modulesDir: "./src/node_modules" }), "pg-native"],
+  externals: [
+    externals({ modulesDir: "./src/node_modules" }),
+    "pg-native",
+  ].filter((item) => item !== "@jtmorrisbytes/lib"),
   devtool: "inline-source-map",
   module: {
     rules: [

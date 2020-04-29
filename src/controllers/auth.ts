@@ -1,4 +1,4 @@
-// @flow
+/// <reference types="@jtmorrisbytes/lib/User/Email" />
 
 import type { Request, Response, NextFunction } from "express";
 import { NIST } from "@jtmorrisbytes/lib/Nist";
@@ -6,13 +6,15 @@ import { NIST } from "@jtmorrisbytes/lib/Nist";
 // I must instantiate the utility classes with new
 const Nist = new NIST.NIST();
 // TODO extend email class with error types
-import { Email } from "@jtmorrisbytes/lib/User/Email";
+import EMAIL, { Email } from "@jtmorrisbytes/lib/User/Email";
 // TODO: implement Password error utility classes
-import { Password } from "@jtmorrisbytes/lib/User/Password";
+import PASSWORD from "@jtmorrisbytes/lib/User/Password";
+
 import { Resource } from "@jtmorrisbytes/lib/Resource";
+import { Name } from "@jtmorrisbytes/lib/User/Name"
 //TODO: allow reason to be passed in and create more specific messages for user
 import User from "@jtmorrisbytes/lib/User";
-import { Error } from "@jtmorrisbytes/lib/Error";
+import ERROR from "@jtmorrisbytes/lib/Error";
 
 const MAX_ELAPSED_REQUEST_TIME = 60 * 1000 * 3;
 
@@ -21,35 +23,32 @@ const axios = require("axios");
 const sha1 = require("sha1");
 const crypto = require("crypto");
 
+type NewUser = {
+  firstName?: Name,
+  lastName?:Name,
+  email: EMAIL.Email,
+  password: typeof PASSWORD.Password,
+  streetAddress?: string,
+  city?:string,
+  state?:string,
+  zip?:string
+}
+
+
 async function register(req: Request, res: Response) {
   // try to destructure, respond with 500 if it fails
-  try {
-    let {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      streetAddress,
-      city,
-      state,
-      zip,
-      password,
-    } = req.body.user;
-    console.log("/api/auth/register called");
-    console.dir(req.body);
-    console.dir(req.query);
-    const db = req.app.get("db");
-    let newUser = new User(
-      email,
-      password,
-      firstName,
-      lastName,
-      streetAddress,
-      city,
-      state,
-      zip
-    );
-    if (!email) {
+  const db = req.app.get("db");
+  let userReq = ((req.body || {}).user) || {}
+  let newUser: NewUser = {
+    ...userReq,
+    firstName: new Name(userReq.firstName),
+    lastName: new Name(userReq.lastName),
+    email : new EMAIL.Email(userReq.email),
+    password: new PASSWORD.Password(userReq.password)
+    
+  }
+  let ErrRes:any = null;
+    if (newUser.email.value === null || undefined) {
       res.status(400).json({
         MESSAGE: "field email is required",
         TYPE: "EMAIL_REQUIRED",
@@ -67,6 +66,8 @@ async function register(req: Request, res: Response) {
         .json({ MESSAGE: `email is already in use`, TYPE: "EMAIL_TAKEN" });
       return;
     }
+    // check password
+    if(newUser.password)
     if (!password) {
       res.status(400).json({
         message: "field password is required",
@@ -121,15 +122,16 @@ async function register(req: Request, res: Response) {
       id: user.users_id,
     };
     res.json({ session: req.session });
+    
   } catch (e) {
     process.stdout.write("Failed to register user ");
     let errRes = new Resource.EGeneralFailure();
     if (e instanceof SyntaxError) {
       process.stdout.write("because of a syntax error ");
-      errRes = new Error.ESyntaxError();
+      errRes = {...errRes,...new ERROR.Error.ESyntaxError()};
     } else if (e instanceof TypeError) {
       process.stdout.write("because of a Type Error ");
-      errRes = new Error.ETypeError();
+      errRes = {...errRes,...new ERROR.Error.ETypeError()};
     }
     res.status(500).json(errRes);
     process.stdout.write("with stacktrace:\n");
