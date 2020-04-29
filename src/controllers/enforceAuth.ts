@@ -11,4 +11,4 @@ function enforceUserLoggedIn(req: Request, res: Response, next: NextFunction) {
     });
   }
 }
-module.exports = { enforceUserLoggedIn };
+export { enforceUserLoggedIn };

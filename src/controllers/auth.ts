@@ -4,15 +4,15 @@ import { NIST } from "@jtmorrisbytes/lib/Nist";
 // I must instantiate the utility classes with new
 const Nist = new NIST.NIST();
 // TODO extend email class with error types
-import EMAIL, { Email } from "@jtmorrisbytes/lib/User/Email";
+import * as EMAIL from "@jtmorrisbytes/lib/User/Email";
 // TODO: implement Password error utility classes
-import PASSWORD from "@jtmorrisbytes/lib/User/Password";
+import * as PASSWORD from "@jtmorrisbytes/lib/User/Password";
 
 import { Resource } from "@jtmorrisbytes/lib/Resource/";
 import { Name } from "@jtmorrisbytes/lib/User/Name";
 //TODO: allow reason to be passed in and create more specific messages for user
-import USER from "@jtmorrisbytes/lib/User";
-import ERROR from "@jtmorrisbytes/lib/Error";
+import * as USER from "@jtmorrisbytes/lib/User";
+import * as ERROR from "@jtmorrisbytes/lib/Error";
 
 const MAX_ELAPSED_REQUEST_TIME = 60 * 1000 * 3;
 
@@ -283,7 +283,7 @@ function startAuthSession(req: Request, res: Response) {
 
   res.json(stateObj);
 }
-module.exports = {
+export {
   register,
   logIn,
   logOut,

@@ -12,7 +12,7 @@
     "build": "rmdir /s /q dist && yarn webpack --mode production && build "
   },
   "dependencies": {
-    "@jtmorrisbytes/lib": "^0.0.17",
+    "@jtmorrisbytes/lib": "^0.0.22",
     "jasmine": "^3.5.0",
     "supertest": "^4.0.2",
     "ts-loader": "^7.0.1",
