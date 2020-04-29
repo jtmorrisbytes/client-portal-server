@@ -2,12 +2,14 @@
   "name": "client-portal-server",
   "description": "the stub module for @jtmorrisbytes/client-portal-server",
   "private": true,
+  "main": "index.js",
   "scripts": {
     "test": "set NODE_ENV=test && npx jasmine",
     "test:watch": "nodemon --watch spec/** --exec \"npm run test\"",
     "start:dev": "set NODE_ENV=development &&  node src/index.js ",
     "watch:dev": "nodemon --watch src --exec \"npm run start:dev\"",
-    "start": "set NODE_ENV=production && nodemon dist"
+    "start": "set NODE_ENV=production && nodemon",
+    "build": "rmdir /s /q dist && yarn webpack && build "
   },
   "dependencies": {
     "jasmine": "^3.5.0",

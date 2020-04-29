@@ -34,3 +34,5 @@ yarn-error.log*
 chain.pem
 fullchain.pem
 privkey.pem
+
+dist
