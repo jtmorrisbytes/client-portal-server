@@ -37,7 +37,7 @@ async function register(req, res) {
       password: PASSWORD.Password(userReq.password),
     };
     if (body.email.value === null || body.email.isValid === false) {
-      errors.push(EMAIL.EBadRequest);
+      res.status(EMAIL.EBadRequest.CODE).json(EMAIL.EBadRequest);
     }
     console.log("trying to get new user by email");
     let dbResult = await db.user.getByEmail(body.email.value);
