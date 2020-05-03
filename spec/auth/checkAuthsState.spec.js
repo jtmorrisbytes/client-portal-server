@@ -1,15 +1,16 @@
 // const jasmine = require("jasmine");
 
 let request = require("supertest");
+const { Server } = require("../../index.js");
 async function startAuthSession(done, callback) {
-  let server = await require("../../src/index.js")();
+  let server = await Server.main();
   request(server)
     .post("/api/auth/")
     .expect("Content-Type", /json/)
     .expect(200, (err, res) => {
       if (err) {
         done(err);
-        console.error("an error occurred while registering", err);
+        console.error("an error occurred while starting auth session", err);
       } else {
         expect(res.body).toEqual(jasmine.any(Object));
         // expect(res.body.auth).toEqual(jasmine.any(Object));
@@ -34,14 +35,14 @@ function expectErrorMessages(res) {
   expect(res.body).toBeDefined(
     "The server should send an error response object in the body"
   );
-  expect(res.body.message).toBeDefined(
+  expect(res.body.MESSAGE).toBeDefined(
     "The server should respond with a message detailing the response"
   );
-  expect(res.body.message).toEqual(jasmine.any(String));
-  expect(res.body.reason).toBeDefined(
+  expect(res.body.MESSAGE).toEqual(jasmine.any(String));
+  expect(res.body.TYPE).toBeDefined(
     "The server should reply with the appropriate constant associated with the event"
   );
-  expect(res.body.reason).toEqual(jasmine.any(String));
+  expect(res.body.TYPE).toEqual(jasmine.any(String));
 }
 function registerUser(
   done,

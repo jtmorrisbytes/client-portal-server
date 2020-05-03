@@ -1,5 +1,5 @@
 // do processing here
-const auth = require("../controllers/auth.ts");
+const auth = require("../controllers/auth.js");
 const {
   logIn,
   logOut,

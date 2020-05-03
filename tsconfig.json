@@ -3,9 +3,9 @@
     "outDir": "./dist/",
     "lib": ["ESNext"],
     "noImplicitAny": true,
-    "module": "esnext",
+    "module": "commonJS",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es6",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "sourceMap": true

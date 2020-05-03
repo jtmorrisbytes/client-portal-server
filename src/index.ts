@@ -1,17 +1,17 @@
 ///<reference path="index.d.ts" />
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 const config = dotenv.config();
-import express from "express";
-import path from "path";
-import fs from "fs";
-import morgan from "morgan";
-import massive from "massive";
-import cookieparser from "cookie-parser";
-import helmet from "helmet";
-import http from "http";
+import * as express from "express";
+import * as path from "path";
+import * as fs from "fs";
+import * as morgan from "morgan";
+import * as massive from "massive";
+import * as cookieparser from "cookie-parser";
+import * as helmet from "helmet";
+import * as http from "http";
 import type { TlsOptions } from "tls";
-import https from "https";
-import constants from "constants";
+import * as https from "https";
+import * as constants from "constants";
 
 // global.log =
 //   process.env.NODE_ENV === "production"
@@ -39,8 +39,8 @@ const app = express();
 
 app.use(require("./configureHelmet"));
 // express-session
-import session from "express-session";
-import connectStore from "connect-sqlite3";
+import * as session from "express-session";
+import * as connectStore from "connect-sqlite3";
 const SQLiteStore = connectStore(session);
 session;
 let sessionConfig: session.SessionOptions = {
@@ -67,7 +67,8 @@ app.use(routes.rootPath, routes.router);
 const MASSIVE_CONFIG = require("./configureMassive");
 
 // https
-async function main(db?: any) {
+
+export async function main(db?: any) {
   if (!db) {
     db = await massive(MASSIVE_CONFIG);
   }
@@ -95,10 +96,20 @@ async function main(db?: any) {
     return await app.listen(SERVER_PORT, SERVER_HOST);
   }
 }
+
 if (NODE_ENV === "production" || NODE_ENV === "development") {
   main().then((server) => {
     console.log(`server listening on ${SERVER_HOST}:${SERVER_PORT}`);
+    setTimeout(() => {
+      if (process.platform === "linux") process.setuid("web");
+      setTimeout(() => {
+        if (process.platform === "linux") {
+          console.log(
+            "This process should not be running as root anymore.. getuid should != 0",
+            process.getuid() !== 0
+          );
+        }
+      }, 0);
+    }, 0);
   });
-} else {
-  module.exports = main;
 }

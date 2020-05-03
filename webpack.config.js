@@ -25,6 +25,8 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
+    library: "Server",
+    libraryTarget: "commonjs",
     filename: "index.js",
     path: path.resolve(__dirname, "dist"),
   },

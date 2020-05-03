@@ -1,15 +1,15 @@
-import type { Request, Response, NextFunction } from "express";
-import { NIST } from "@jtmorrisbytes/lib/Nist";
+import { NIST, ENist } from "@jtmorrisbytes/lib/Nist";
+
 //until I find a way to make static classes
 // I must instantiate the utility classes with new
-const Nist = new NIST.NIST();
-// TODO extend email class with error types
-import * as EMAIL from "@jtmorrisbytes/lib/User/Email";
-// TODO: implement Password error utility classes
-import * as PASSWORD from "@jtmorrisbytes/lib/User/Password";
 
-import { Resource } from "@jtmorrisbytes/lib/Resource/";
-import { Name } from "@jtmorrisbytes/lib/User/Name";
+// TODO extend email class with error types
+import * as EMAIL from "@jtmorrisbytes/lib/Email";
+// TODO: implement Password error utility classes
+import * as PASSWORD from "@jtmorrisbytes/lib/Password";
+
+import * as Response from "@jtmorrisbytes/lib/Response/";
+import { Name } from "@jtmorrisbytes/lib/Name";
 //TODO: allow reason to be passed in and create more specific messages for user
 import * as USER from "@jtmorrisbytes/lib/User";
 import * as ERROR from "@jtmorrisbytes/lib/Error";
@@ -21,130 +21,140 @@ const axios = require("axios");
 const sha1 = require("sha1");
 const crypto = require("crypto");
 
-type NewUser = {
-  firstName?: Name;
-  lastName?: Name;
-  email: EMAIL.Email;
-  password: PASSWORD.Password;
-  streetAddress?: string;
-  phoneNumber: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-};
-
-async function register(req: Request, res: Response) {
+async function register(req, res) {
   // try to destructure, respond with 500 if it fails
   try {
     const db = req.app.get("db");
     let userReq = (req.body || {}).user || {};
-    let newUser: NewUser = {
-      ...userReq,
+    let body = {
+      address: userReq.streetAddress || "",
+      city: userReq.city || "",
+      state: userReq.state || "",
+      zip: userReq.zip || "",
       firstName: new Name(userReq.firstName),
       lastName: new Name(userReq.lastName),
-      email: new EMAIL.Email(userReq.email),
-      password: new PASSWORD.Password(userReq.password),
+      email: EMAIL.Email(userReq.email),
+      password: PASSWORD.Password(userReq.password),
     };
-    let errors: any[] = [];
-    if (newUser.email.value === null || newUser.email.isValid === false) {
-      errors.push(new EMAIL.EBadRequest());
+    if (body.email.value === null || body.email.isValid === false) {
+      errors.push(EMAIL.EBadRequest);
     }
-    let dbResult = await db.user.getByEmail(newUser.email);
+    console.log("trying to get new user by email");
+    let dbResult = await db.user.getByEmail(body.email.value);
     if (dbResult.length > 0) {
-      errors.push(new EMAIL.ENotAuthorized());
+      res.status(EMAIL.ENotAuthorized.CODE).json(EMAIL.ENotAuthorized);
+      return;
     }
     // check password
-    if (newUser.password.value == null) {
-      errors.push(new PASSWORD.EMissing());
+    if (body.password.value == null) {
+      console.log("password was missing from request");
+      res.status(PASSWORD.EMissing.CODE).json(PASSWORD.EMissing);
+      return;
     }
     // email is marked as a unique, required field. if it already exists, the database will throw an error
     // run
-    if (newUser.password.isValid === false) {
-      errors.push(new PASSWORD.ENotValid());
+
+    if (body.password.isValid === false) {
+      console.log("password was not valid");
+      res.status(PASSWORD.ENotValid.CODE).json(PASSWORD.ENotValid);
+      return;
     }
+    console.log("trying NIST TOKEN");
     if (process.env.NIST_TOKEN) {
       console.log("attempting NIST check with token ", process.env.NIST_TOKEN);
-      let nistHash = sha1(newUser.password);
+      let nistHash = sha1(body.password.value);
       let { found } = await axios.get(
-        Nist.URL + nistHash + `?api_key=${process.env.NIST_TOKEN}`
+        NIST.URL + nistHash + `?api_key=${process.env.NIST_TOKEN}`
       );
       if (found) {
         console.log(
           "Password found in NIST Database, Refusing to allow password"
         );
-        errors.push({
-          ...new NIST.ENist(),
-          link: Nist.INFOLINK,
+        res.status(400).json({
+          ...ENist,
+          link: NIST.INFOLINK,
         });
       }
       console.log("Password not found in NIST Database. continuing");
     }
-    if (errors.length > 0) {
-      res.status(400).json({ ...new Resource.EBadRequest(), errors: errors });
-      return;
+    // common errors have been handled at this point, continu
+    // only commit the database if not in testing mode
+    if (req.query.test === true) {
+      res.status(200).json({
+        id: -1,
+        ...body,
+        firstName: body.firstName.value,
+        lastName: body.lastName.value,
+        email: body.email.value,
+      });
+    } else {
+      let hash = await bcrypt.hash(
+        body.password.value,
+        await bcrypt.genSalt(15)
+      );
+
+      console.log("trying to create user");
+      let result = await db.user.create(
+        body.firstName.value,
+        body.lastName.value,
+        hash,
+        body.email.value,
+        body.phoneNumber,
+        body.streetAddress,
+        body.city,
+        body.state,
+        body.zip
+      );
+      let user = result[0];
+      console.log("/api/auth/register DB create user result", user);
+      req.session.user = {
+        id: user.users_id,
+      };
+      res.json({ session: req.session });
     }
-    // common errors have been handled at this point, continue
-    let encoded = Buffer.from(newUser.password).toString("base64");
-    let hash = await bcrypt.hash(encoded, await bcrypt.genSalt(15));
-    let result = await db.user.create(
-      newUser.firstName.value,
-      newUser.lastName.value,
-      hash,
-      newUser.email.value,
-      newUser.phoneNumber,
-      newUser.streetAddress,
-      newUser.city,
-      newUser.state,
-      newUser.zip
-    );
-    let user = result[0];
-    console.log("/api/auth/register DB create user result", user);
-    req.session.user = {
-      id: user.users_id,
-    };
-    res.json({ session: req.session });
   } catch (e) {
     process.stdout.write("Failed to register user ");
-    let errRes = new Resource.EGeneralFailure();
+    let errRes = Response.EGeneralFailure;
     if (e instanceof SyntaxError) {
       process.stdout.write("because of a syntax error ");
-      errRes = { ...errRes, ...new ERROR.Error.ESyntaxError() };
+      errRes = { ...errRes, ...ERROR.ESyntaxError };
     } else if (e instanceof TypeError) {
       process.stdout.write("because of a Type Error ");
-      errRes = { ...errRes, ...new ERROR.Error.ETypeError() };
+      errRes = { ...errRes, ...ERROR.ETypeError };
     }
     res.status(500).json(errRes);
     process.stdout.write("with stacktrace:\n");
     console.error(e);
   }
 }
-async function getSession(req: Request, res: Response) {
+async function getSession(req, res) {
   try {
     let session = req.session || null;
-    res.send(session);
+    res.json(session);
   } catch (e) {
     console.error("Failed to get session");
   }
 }
-async function logIn(req: Request, res: Response) {
+async function logIn(req, res) {
   console.log(
     "/api/auth/login: login requested user object",
     req.body.user || "NOT FOUND"
   );
   try {
     let errors = [];
-    let { email, password } = req.body.user;
+    let email = req.body.email;
+    let password = req.body.password;
     if (!email) {
       console.warn("/api/auth/login: email was missing from request");
       //Ideally allow reason to be passed through
-      errors.push(new EMAIL.EMissing());
+      errors.push(EMAIL.EMissing);
     }
     if (!password) {
       console.warn("/api/auth/login: password was missing from request");
-      errors.push(new PASSWORD.EMissing());
+      errors.push(PASSWORD.EMissing);
     }
     if (errors.length > 0) {
-      res.status(400).json({ ...new Resource.EBadRequest(), errors });
+      res.status(400).json({ ...Response.EBadRequest, errors });
       return;
     } else {
       errors = [];
@@ -152,14 +162,13 @@ async function logIn(req: Request, res: Response) {
     console.log("searching database for username");
     let result = await req.app.get("db").user.getByEmail(email);
     if (result.length === 0) {
-      res.status(401).json(new USER.ENotFoundByEmail());
+      res.status(401).json(USER.ENotFoundByEmail);
     } else {
       let user = result[0];
       console.log("/api/auth/login user found, comparing hash");
-      let authenticated: Boolean = await bcrypt.compare(
-        Buffer.from(password).toString("base64"),
-        user.hash
-      );
+      console.log("password", password, "hash", hash);
+
+      let authenticated = await bcrypt.compare(password, user.hash);
       if (authenticated) {
         console.log("logging in user with id:", user.users_id);
         (req.session.user = {
@@ -168,34 +177,34 @@ async function logIn(req: Request, res: Response) {
           res.json({ session: req.session });
       } else {
         console.warn("/api/auth/login recieved an invalid password");
-        res.status(401).json(new PASSWORD.ENotAuthorized());
+        res.status(PASSWORD.ENotAuthorized.CODE).json(PASSWORD.ENotAuthorized);
       }
     }
   } catch (e) {
     process.stdout.write("Failed to log in user ");
     let errRes = {
-      ...new Resource.EGeneralFailure(),
+      ...Response.EGeneralFailure,
       REASON: e,
     };
     if (e instanceof TypeError) {
       errRes = {
         ...errRes,
-        ...new ERROR.Error.ETypeError(),
+        ...ERROR.ETypeError,
       };
     }
     if (e instanceof ReferenceError) {
       process.stdout.write("because of a ReferenceError");
       errRes = {
         ...errRes,
-        ...new ERROR.Error.ESyntaxError(),
+        ...ERROR.ESyntaxError,
       };
     }
     process.stdout.write(" with stacktrace\n");
     console.log(e);
-    res.status(500).json(errRes);
+    res.status(errRes.CODE).json(errRes);
   }
 }
-async function logOut(req: Request, res: Response) {
+async function logOut(req, res) {
   req.session.destroy((err) => {
     if (err) {
       console.log(err);
@@ -204,11 +213,11 @@ async function logOut(req: Request, res: Response) {
   });
   res.sendStatus(200);
 }
-function getUser(req: Request, res: Response) {
+function getUser(req, res) {
   res.json({ user: req.session.user || null });
 }
 
-function checkAuthState(req: Request, res: Response, next: NextFunction) {
+function checkAuthState(req, res, next) {
   // const stateObj = req.app.get(req.query.state||req.body.state);
   // if(!stateObj)
   // const { timestamp, state, ipAddr } = auth || {};
@@ -222,12 +231,12 @@ function checkAuthState(req: Request, res: Response, next: NextFunction) {
   if (!req.body) {
     res
       .status(400)
-      .json({ ...new Resource.EBadRequest(), reason: "Empty request body" });
+      .json({ ...Response.EBadRequest, REASON: "Empty request body" });
     return;
   }
   if (!req.body.state) {
     res.status(401).json({
-      ...new Resource.ENotAuthorized(),
+      ...Response.ENotAuthorized,
       REASON:
         "The state parameter is required to continue with this request, but was missing",
       TYPE: "AUTH_STATE_MISSING",
@@ -240,7 +249,7 @@ function checkAuthState(req: Request, res: Response, next: NextFunction) {
     console.log(state, req.body.state);
     // Stub this error for now
     res.status(401).json({
-      ...new Resource.ENotAuthorized(),
+      ...Response.ENotAuthorized,
       REASON: "The auth parameter provided in the body was not found",
       TYPE: "AUTH_STATE_NOT_FOUND",
     });
@@ -249,7 +258,7 @@ function checkAuthState(req: Request, res: Response, next: NextFunction) {
   if (state.ipAddr != req.connection.remoteAddress) {
     req.app.set(state.state, undefined);
     res.status(401).json({
-      ...new Resource.ENotAuthorized(),
+      ...Response.ENotAuthorized,
       REASON: "You are not allowed to switch devices between login flow",
       TYPE: "AUTH_IP_MISMATCH",
     });
@@ -259,7 +268,7 @@ function checkAuthState(req: Request, res: Response, next: NextFunction) {
   if (currentTimestamp > state.timestamp + MAX_ELAPSED_REQUEST_TIME) {
     req.app.set(state.state, undefined);
     res.status(401).json({
-      ...new Resource.ENotAuthorized(),
+      ...Response.ENotAuthorized,
       REASON: "Your login/register session has expired, please try again ",
       TYPE: "AUTH_SESSION_EXPIRED",
     });
@@ -270,7 +279,7 @@ function checkAuthState(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-function startAuthSession(req: Request, res: Response) {
+function startAuthSession(req, res) {
   // if we already have a session, clear the session
   // and restart it
   const state = crypto.randomBytes(64).toString("base64");
