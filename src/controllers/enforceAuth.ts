@@ -10,6 +10,8 @@ function enforceUserLoggedIn(req: Request, res: Response, next: NextFunction) {
       TYPE: "LOGIN_REQUIRED",
       path: "/api/auth/login",
     });
+  } else {
+    next();
   }
 }
 export { enforceUserLoggedIn };
