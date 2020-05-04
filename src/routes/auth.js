@@ -24,7 +24,6 @@ const basePath = "/auth";
 */
 router.post("/", startAuthSession);
 
-router.get("/user", getUser);
 router.get("/session", getSession);
 // router.use(checkTimeStamp);
 router.post("/register", checkAuthState, register);

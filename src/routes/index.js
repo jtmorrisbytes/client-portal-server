@@ -14,7 +14,7 @@ function postRequest(req, res) {
 }
 
 const auth = require("./auth");
-
+const user = require("./user");
 // mount routers
 // const { enforceClientIdExists } = require( "../controllers/clientId";
 const { REACT_APP_CLIENT_ID } = process.env;
@@ -25,6 +25,7 @@ const { REACT_APP_CLIENT_ID } = process.env;
 routes.post(auth.basePath + "/logout", auth.controller.logOut);
 routes.use(auth.basePath, auth.router);
 routes.use(enforceUserLoggedIn);
+routes.use(user.basePath, user.router);
 // finalize the request
 
 module.exports = { router: routes, rootPath };
