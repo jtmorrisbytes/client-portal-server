@@ -196,7 +196,7 @@ async function logIn(req, res) {
     } else {
       let user = result[0];
       con.log("/api/auth/login user found, comparing hash");
-      con.log("password", password, "hash", hash);
+      con.log("password", password);
 
       let authenticated = await bcrypt.compare(password, user.hash);
       if (authenticated) {
@@ -204,7 +204,7 @@ async function logIn(req, res) {
         (req.session.user = {
           id: user.users_id,
         }),
-          res.json({ session: req.session });
+          res.json({ ...req.session.user });
       } else {
         con.warn("/api/auth/login recieved an invalid password");
         res.status(PASSWORD.ENotAuthorized.CODE).json(PASSWORD.ENotAuthorized);
@@ -240,11 +240,8 @@ async function logOut(req, res) {
       con.log(err);
     }
     res.clearCookie("connect.sid");
+    res.sendStatus(200);
   });
-  res.sendStatus(200);
-}
-function getUser(req, res) {
-  res.json({ user: req.session.user || null });
 }
 
 function checkAuthState(req, res, next) {
@@ -326,7 +323,6 @@ export {
   register,
   logIn,
   logOut,
-  getUser,
   startAuthSession,
   checkAuthState,
   getSession,

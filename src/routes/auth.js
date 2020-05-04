@@ -4,7 +4,6 @@ const {
   logIn,
   logOut,
   register,
-  getUser,
   startAuthSession,
   checkAuthState,
   getSession,

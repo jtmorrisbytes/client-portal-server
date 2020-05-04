@@ -1,0 +1,1 @@
+SELECT users_id, first_name, last_name, email, street_address, city, state, zip from  users where users_id = $1;

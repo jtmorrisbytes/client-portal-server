@@ -1,4 +1,14 @@
 function getUser(req, res) {
-  res.json({ user: req.session.user || null });
+  if ((req.session.user || {}).id) {
+    const db = req.app.get("db");
+    try {
+      let result = db.user.getLoggedIn(req.session.user.id);
+      let user = result[0];
+      res.json(user || {});
+    } catch (e) {
+      res.status(500).json({});
+    }
+  }
+  res.json({ user: null });
 }
 module.exports = { getUser };
