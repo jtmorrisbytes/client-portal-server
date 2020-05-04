@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@jtmorrisbytes/lib": "^0.0.32",
+    "@types/winston": "^2.4.4",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^4.0.4",
@@ -31,7 +32,8 @@
     "node-http2": "^4.0.1",
     "redis": "^3.0.2",
     "sha1": "^1.1.1",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.2",

@@ -12,7 +12,8 @@
     "build:test": "yarn run delDist && set NODE_ENV=test && yarn webpack --mode none && copyFiles",
     "start": "set NODE_ENV=production && nodemon",
     "build": "yarn run delDist && yarn webpack --mode production && copyFiles ",
-    "buildDev": "yarn run delDist && yarn webpack --mode development && copyFiles "
+    "buildDev": "yarn run delDist && yarn webpack --mode development && copyFiles ",
+    "upload": "yarn run delDist && yarn webpack --mode production && copyFiles && upload"
   },
   "dependencies": {
     "@jtmorrisbytes/lib": "0.0.28",

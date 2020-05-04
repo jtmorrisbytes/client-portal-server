@@ -4,6 +4,9 @@ import { NIST, ENist } from "@jtmorrisbytes/lib/Nist";
 // I must instantiate the utility classes with new
 
 // TODO extend email class with error types
+
+import * as winston from "winston";
+
 import * as EMAIL from "@jtmorrisbytes/lib/Email";
 // TODO: implement Password error utility classes
 import * as PASSWORD from "@jtmorrisbytes/lib/Password";
@@ -13,6 +16,16 @@ import { Name } from "@jtmorrisbytes/lib/Name";
 //TODO: allow reason to be passed in and create more specific messages for user
 import * as USER from "@jtmorrisbytes/lib/User";
 import * as ERROR from "@jtmorrisbytes/lib/Error";
+const levels = Object.keys(winston.config.syslog.levels);
+let { CONSOLE_LOG_LEVEL } = process.env;
+
+const con = winston.createLogger({
+  transports: [
+    new winston.transports.Console({
+      level: levels.includes(CONSOLE_LOG_LEVEL) ? CONSOLE_LOG_LEVEL : "warning",
+    }),
+  ],
+});
 
 const MAX_ELAPSED_REQUEST_TIME = 60 * 1000 * 3;
 
@@ -21,6 +34,7 @@ const axios = require("axios");
 const sha1 = require("sha1");
 const crypto = require("crypto");
 
+con.debug("PASSWORD MODULE: ", PASSWORD);
 async function register(req, res) {
   // try to destructure, respond with 500 if it fails
   try {
@@ -37,9 +51,15 @@ async function register(req, res) {
       password: PASSWORD.Password(userReq.password),
     };
     if (body.email.value === null || body.email.isValid === false) {
+      con.debug(
+        "Email.value was null or isValid was false. Value",
+        body.email.value,
+        "IsValid: ",
+        body.email.isValid
+      );
       res.status(EMAIL.EBadRequest.CODE).json(EMAIL.EBadRequest);
     }
-    console.log("trying to get new user by email");
+    con.debug("trying to get new user by email");
     let dbResult = await db.user.getByEmail(body.email.value);
     if (dbResult.length > 0) {
       res.status(EMAIL.ENotAuthorized.CODE).json(EMAIL.ENotAuthorized);
@@ -47,7 +67,7 @@ async function register(req, res) {
     }
     // check password
     if (body.password.value == null) {
-      console.log("password was missing from request");
+      con.debug("password was missing from request");
       res.status(PASSWORD.EMissing.CODE).json(PASSWORD.EMissing);
       return;
     }
@@ -55,19 +75,19 @@ async function register(req, res) {
     // run
 
     if (body.password.isValid === false) {
-      console.log("password was not valid");
+      con.debug("password was not valid");
       res.status(PASSWORD.ENotValid.CODE).json(PASSWORD.ENotValid);
       return;
     }
-    console.log("trying NIST TOKEN");
+    con.debug("trying NIST TOKEN");
     if (process.env.NIST_TOKEN) {
-      console.log("attempting NIST check with token ", process.env.NIST_TOKEN);
+      con.debug("attempting NIST check with token ", process.env.NIST_TOKEN);
       let nistHash = sha1(body.password.value);
       let { found } = await axios.get(
         NIST.URL + nistHash + `?api_key=${process.env.NIST_TOKEN}`
       );
       if (found) {
-        console.log(
+        con.debug(
           "Password found in NIST Database, Refusing to allow password"
         );
         res.status(400).json({
@@ -75,7 +95,7 @@ async function register(req, res) {
           link: NIST.INFOLINK,
         });
       }
-      console.log("Password not found in NIST Database. continuing");
+      con.debug("Password not found in NIST Database. continuing");
     }
     // common errors have been handled at this point, continu
     // only commit the database if not in testing mode
@@ -93,7 +113,7 @@ async function register(req, res) {
         await bcrypt.genSalt(15)
       );
 
-      console.log("trying to create user");
+      con.debug("trying to create user");
       let result = await db.user.create(
         body.firstName.value,
         body.lastName.value,
@@ -106,7 +126,7 @@ async function register(req, res) {
         body.zip
       );
       let user = result[0];
-      console.log("/api/auth/register DB create user result", user);
+      con.debug("/api/auth/register DB create user result", user);
       req.session.user = {
         id: user.users_id,
       };
@@ -124,7 +144,7 @@ async function register(req, res) {
     }
     res.status(500).json(errRes);
     process.stdout.write("with stacktrace:\n");
-    console.error(e);
+    con.error(e);
   }
 }
 async function getSession(req, res) {
@@ -132,11 +152,11 @@ async function getSession(req, res) {
     let session = req.session || null;
     res.json(session);
   } catch (e) {
-    console.error("Failed to get session");
+    con.error("Failed to get session");
   }
 }
 async function logIn(req, res) {
-  console.log(
+  con.log(
     "/api/auth/login: login requested user object",
     req.body.user || "NOT FOUND"
   );
@@ -145,12 +165,12 @@ async function logIn(req, res) {
     let email = req.body.email;
     let password = req.body.password;
     if (!email) {
-      console.warn("/api/auth/login: email was missing from request");
+      con.warn("/api/auth/login: email was missing from request");
       //Ideally allow reason to be passed through
       errors.push(EMAIL.EMissing);
     }
     if (!password) {
-      console.warn("/api/auth/login: password was missing from request");
+      con.warn("/api/auth/login: password was missing from request");
       errors.push(PASSWORD.EMissing);
     }
     if (errors.length > 0) {
@@ -159,24 +179,24 @@ async function logIn(req, res) {
     } else {
       errors = [];
     }
-    console.log("searching database for username");
+    con.log("searching database for username");
     let result = await req.app.get("db").user.getByEmail(email);
     if (result.length === 0) {
       res.status(401).json(USER.ENotFoundByEmail);
     } else {
       let user = result[0];
-      console.log("/api/auth/login user found, comparing hash");
-      console.log("password", password, "hash", hash);
+      con.log("/api/auth/login user found, comparing hash");
+      con.log("password", password, "hash", hash);
 
       let authenticated = await bcrypt.compare(password, user.hash);
       if (authenticated) {
-        console.log("logging in user with id:", user.users_id);
+        con.log("logging in user with id:", user.users_id);
         (req.session.user = {
           id: user.users_id,
         }),
           res.json({ session: req.session });
       } else {
-        console.warn("/api/auth/login recieved an invalid password");
+        con.warn("/api/auth/login recieved an invalid password");
         res.status(PASSWORD.ENotAuthorized.CODE).json(PASSWORD.ENotAuthorized);
       }
     }
@@ -200,14 +220,14 @@ async function logIn(req, res) {
       };
     }
     process.stdout.write(" with stacktrace\n");
-    console.log(e);
+    con.log(e);
     res.status(errRes.CODE).json(errRes);
   }
 }
 async function logOut(req, res) {
   req.session.destroy((err) => {
     if (err) {
-      console.log(err);
+      con.log(err);
     }
     res.clearCookie("connect.sid");
   });
@@ -246,7 +266,7 @@ function checkAuthState(req, res, next) {
   }
   let state = req.app.get(req.body.state);
   if (!state) {
-    console.log(state, req.body.state);
+    con.log(state, req.body.state);
     // Stub this error for now
     res.status(401).json({
       ...Response.ENotAuthorized,
