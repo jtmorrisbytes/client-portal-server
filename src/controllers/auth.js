@@ -102,7 +102,19 @@ async function register(req, res) {
     // only commit the database if not in testing mode
     let hash = await bcrypt.hash(body.password.value, await bcrypt.genSalt(15));
 
-    con.debug("trying to create user");
+    con.debug(
+      "trying to create user",
+      body.firstName.value || "no first name",
+      body.lastName.value || "no last name",
+      hash,
+      body.email.value,
+      body.phoneNumber || "no phone number",
+      body.streetAddress || "no street address",
+      body.city,
+      body.state,
+      body.zip
+    );
+
     let result = await db.user.create(
       body.firstName.value,
       body.lastName.value,
@@ -120,6 +132,7 @@ async function register(req, res) {
       id: user.users_id,
       firstName: user.first_name,
       lastName: user.last_name,
+      email: user.email,
       phoneNumber: user.phone_number,
       streetAddress: user.street_address,
       city: user.city,
