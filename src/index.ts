@@ -34,7 +34,7 @@ let SESSION_SECRET = process.env.SESSION_SECRET || "";
 let SERVER_PORT: number = Number(process.env.SERVER_PORT) || 3000;
 let SERVER_HOST: string = process.env.SERVER_HOST || "127.0.0.1";
 //normalize variables
-
+console.log("CWD", process.cwd() || "no CWD");
 const app = express();
 
 app.use(require("./configureHelmet"));
@@ -46,10 +46,15 @@ session;
 let sessionConfig: session.SessionOptions = {
   store: new SQLiteStore(),
   secret: SESSION_SECRET,
-  resave: false,
+  resave: true,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 5 },
+  proxy: true,
+  cookie: {
+    maxAge: 1000 * 60 * 5,
+    secure: process.env.NODE_ENV === "production",
+  },
 };
+app.use(express.static(path.join(process.cwd(), "build")));
 
 if (NODE_ENV === "production") {
   sessionConfig.cookie.secure = true;

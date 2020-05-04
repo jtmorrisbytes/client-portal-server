@@ -31,7 +31,6 @@ const axios = require("axios");
 const sha1 = require("sha1");
 const crypto = require("crypto");
 
-con.info("EMAIL MODULEE: ", EMAIL);
 async function register(req, res) {
   // try to destructure, respond with 500 if it fails
   console.log("register query", req.query);

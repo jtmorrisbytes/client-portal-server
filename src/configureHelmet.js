@@ -2,6 +2,8 @@ module.exports = require("helmet")({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+
       styleSrc: [
         "'self'",
         "https://stackpath.bootstrapcdn.com/",
@@ -18,7 +20,7 @@ module.exports = require("helmet")({
     features: {
       layoutAnimations: ["'self'"],
       syncScript: ["'self'"],
-      documentDomain: ["'none'"],
+      documentDomain: ["'self'"],
     },
   },
 });
