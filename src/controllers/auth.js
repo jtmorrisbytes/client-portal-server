@@ -35,6 +35,7 @@ con.info("EMAIL MODULEE: ", EMAIL);
 async function register(req, res) {
   // try to destructure, respond with 500 if it fails
   console.log("register query", req.query);
+  console.log("register body", req.body);
   try {
     const db = req.app.get("db");
     let userReq = (req.body || {}).user || {};
@@ -43,6 +44,7 @@ async function register(req, res) {
       city: userReq.city || "",
       state: userReq.state || "",
       zip: userReq.zip || "",
+      phoneNumber: userReq.phoneNumber || "",
       firstName: new Name(userReq.firstName),
       lastName: new Name(userReq.lastName),
       email: EMAIL.Email(userReq.email),
@@ -110,9 +112,9 @@ async function register(req, res) {
       body.email.value,
       body.phoneNumber || "no phone number",
       body.streetAddress || "no street address",
-      body.city,
-      body.state,
-      body.zip
+      body.city || "no city provided",
+      body.state || "no state provided",
+      body.zip || "no zip provided"
     );
 
     let result = await db.user.create(
