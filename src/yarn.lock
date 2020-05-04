@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@jtmorrisbytes/lib@^0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@jtmorrisbytes/lib/-/lib-0.0.32.tgz#d08cbd9c1410bba0caed6a202a801a78fa1416b8"
-  integrity sha512-GCElNcQsC+JGdEWoiburq2nSw1zMp8K2I95UbQDXclQOFuUoyvAHMzZ79o1RaR7qxzraF748+Wq0RH+cUiUuOw==
+"@jtmorrisbytes/lib@^0.0.36":
+  version "0.0.36"
+  resolved "https://registry.yarnpkg.com/@jtmorrisbytes/lib/-/lib-0.0.36.tgz#96694214e1712b962d188d72b3b133f87d298702"
+  integrity sha512-1JRbGOHaQBkzTH5GY9W7j+WCU999jNhKcFUXYtI88hGQyOCcqumUslIXluyPRe3uioBvrs8rgJ4uwcrp+fQS5Q==
 
 "@types/body-parser@*":
   version "1.19.0"

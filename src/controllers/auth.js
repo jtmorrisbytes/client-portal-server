@@ -5,7 +5,7 @@ import { NIST, ENist } from "@jtmorrisbytes/lib/Nist";
 
 // TODO extend email class with error types
 
-import * as winston from "winston";
+// import * as winston from "winston";
 
 import * as EMAIL from "@jtmorrisbytes/lib/Email";
 // TODO: implement Password error utility classes
@@ -16,17 +16,14 @@ import { Name } from "@jtmorrisbytes/lib/Name";
 //TODO: allow reason to be passed in and create more specific messages for user
 import * as USER from "@jtmorrisbytes/lib/User";
 import * as ERROR from "@jtmorrisbytes/lib/Error";
-const levels = Object.keys(winston.config.syslog.levels);
-let { CONSOLE_LOG_LEVEL } = process.env;
-
-const con = winston.createLogger({
-  transports: [
-    new winston.transports.Console({
-      level: levels.includes(CONSOLE_LOG_LEVEL) ? CONSOLE_LOG_LEVEL : "warning",
-    }),
-  ],
-});
-
+// const con = winston.createLogger({
+//   transports: [
+//     new winston.transports.Console({
+//       level: winston.config.syslog.levels.debug,
+//     }),
+//   ],
+// });
+const con = console;
 const MAX_ELAPSED_REQUEST_TIME = 60 * 1000 * 3;
 
 const bcrypt = require("bcryptjs");
@@ -34,9 +31,10 @@ const axios = require("axios");
 const sha1 = require("sha1");
 const crypto = require("crypto");
 
-con.debug("PASSWORD MODULE: ", PASSWORD);
+con.info("EMAIL MODULEE: ", EMAIL);
 async function register(req, res) {
   // try to destructure, respond with 500 if it fails
+  console.log("register query", req.query);
   try {
     const db = req.app.get("db");
     let userReq = (req.body || {}).user || {};
@@ -50,32 +48,35 @@ async function register(req, res) {
       email: EMAIL.Email(userReq.email),
       password: PASSWORD.Password(userReq.password),
     };
-    if (body.email.value === null || body.email.isValid === false) {
-      con.debug(
-        "Email.value was null or isValid was false. Value",
-        body.email.value,
-        "IsValid: ",
-        body.email.isValid
-      );
-      res.status(EMAIL.EBadRequest.CODE).json(EMAIL.EBadRequest);
+    if (userReq.email == null) {
+      con.debug("req.user.email was null or undefined", userReq.email);
+      res.status(EMAIL.EMissing.CODE).json(EMAIL.EMissing);
+      return;
+    } else if (body.email.isValid === false) {
+      res.status(EMAIL.ENotValid);
     }
+    // email is marked as a unique, required field. if it already exists, the database will throw an error
     con.debug("trying to get new user by email");
     let dbResult = await db.user.getByEmail(body.email.value);
     if (dbResult.length > 0) {
       res.status(EMAIL.ENotAuthorized.CODE).json(EMAIL.ENotAuthorized);
       return;
     }
-    // check password
-    if (body.password.value == null) {
+    // check raw request for password
+    if (userReq.password == null) {
       con.debug("password was missing from request");
       res.status(PASSWORD.EMissing.CODE).json(PASSWORD.EMissing);
       return;
-    }
-    // email is marked as a unique, required field. if it already exists, the database will throw an error
-    // run
-
-    if (body.password.isValid === false) {
-      con.debug("password was not valid");
+    } else if (body.password.isValid === false) {
+      con.debug(
+        "password was not valid",
+        `body.password.value ${
+          body.password.value
+        }, typeof body.password.value ${typeof body.password.value}`,
+        `raw request: password ${
+          userReq.password
+        }, type ${typeof userReq.password}`
+      );
       res.status(PASSWORD.ENotValid.CODE).json(PASSWORD.ENotValid);
       return;
     }
@@ -97,41 +98,35 @@ async function register(req, res) {
       }
       con.debug("Password not found in NIST Database. continuing");
     }
-    // common errors have been handled at this point, continu
+    // common errors have been handled at this point, continue
     // only commit the database if not in testing mode
-    if (req.query.test === true) {
-      res.status(200).json({
-        id: -1,
-        ...body,
-        firstName: body.firstName.value,
-        lastName: body.lastName.value,
-        email: body.email.value,
-      });
-    } else {
-      let hash = await bcrypt.hash(
-        body.password.value,
-        await bcrypt.genSalt(15)
-      );
+    let hash = await bcrypt.hash(body.password.value, await bcrypt.genSalt(15));
 
-      con.debug("trying to create user");
-      let result = await db.user.create(
-        body.firstName.value,
-        body.lastName.value,
-        hash,
-        body.email.value,
-        body.phoneNumber,
-        body.streetAddress,
-        body.city,
-        body.state,
-        body.zip
-      );
-      let user = result[0];
-      con.debug("/api/auth/register DB create user result", user);
-      req.session.user = {
-        id: user.users_id,
-      };
-      res.json({ session: req.session });
-    }
+    con.debug("trying to create user");
+    let result = await db.user.create(
+      body.firstName.value,
+      body.lastName.value,
+      hash,
+      body.email.value,
+      body.phoneNumber,
+      body.streetAddress,
+      body.city,
+      body.state,
+      body.zip
+    );
+    let user = result[0];
+    con.debug("/api/auth/register DB create user result", user);
+    req.session.user = {
+      id: user.users_id,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      phoneNumber: user.phone_number,
+      streetAddress: user.street_address,
+      city: user.city,
+      state: user.state,
+      zip: user.zip,
+    };
+    res.json(req.session);
   } catch (e) {
     process.stdout.write("Failed to register user ");
     let errRes = Response.EGeneralFailure;
