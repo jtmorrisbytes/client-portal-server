@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@jtmorrisbytes/lib": "^0.0.37",
+    "@types/express-ws": "^3.0.0",
     "@types/winston": "^2.4.4",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
@@ -26,6 +27,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "express-ws": "^4.0.0",
     "helmet": "^3.22.0",
     "massive": "^6.3.0",
     "morgan": "^1.10.0",

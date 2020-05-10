@@ -1,1 +1,1 @@
-SELECT first_name,last_name,email,phone_number,street_address,city,state,zip from clients
+SELECT first_name,last_name,email,phone_number,street_address,city,state,zip from client

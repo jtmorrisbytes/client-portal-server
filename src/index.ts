@@ -6,25 +6,13 @@ import * as path from "path";
 import * as fs from "fs";
 import * as morgan from "morgan";
 import * as massive from "massive";
-import * as cookieparser from "cookie-parser";
-import * as helmet from "helmet";
-import * as http from "http";
+// import * as cookieparser from "cookie-parser";
+// import * as helmet from "helmet";
+// import * as http from "http";
 import type { TlsOptions } from "tls";
 import * as https from "https";
 import * as constants from "constants";
-
-// global.log =
-//   process.env.NODE_ENV === "production"
-//     ? function () {}
-//     : function (...rest:[]) {
-//         let date = new Date();
-//         console.log(
-//           `[Time: ${date.getHours()}H${date.getMinutes()}M ${date.getSeconds()}S ${date.getMilliseconds()}MS]`,
-//           ...rest
-//         );
-//       };
-// global.debug =
-//   process.env.NODE_ENV === "production" ? function () {} : console.debug;
+import * as ws from "express-ws";
 
 let NODE_ENV: string = process.env.NODE_ENV || "";
 let SSL_CERT: string = process.env.SSL_CERT || "";
@@ -37,12 +25,25 @@ let SERVER_HOST: string = process.env.SERVER_HOST || "127.0.0.1";
 console.log("CWD", process.cwd() || "no CWD");
 const app = express();
 
+let SSL_OPTS: TlsOptions = {
+  key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
+  cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
+  secureOptions: constants.SSL_OP_NO_SSLv3,
+  // ca: [fs.readFileSync("chain.pem")],
+};
+if (SSL_CA) {
+  SSL_OPTS.ca = [fs.readFileSync(SSL_CA)];
+}
+
+let server = https.createServer(SSL_OPTS, app);
+const wsinstance = ws(app, server);
+
 app.use(require("./configureHelmet"));
 // express-session
 import * as session from "express-session";
 import * as connectStore from "connect-sqlite3";
 const SQLiteStore = connectStore(session);
-session;
+
 let sessionConfig: session.SessionOptions = {
   store: new SQLiteStore(),
   secret: SESSION_SECRET,
@@ -78,26 +79,11 @@ export async function main(db?: any) {
     db = await massive(MASSIVE_CONFIG);
   }
   app.set("db", db);
-  let server = http.createServer(app);
   if (NODE_ENV === "production") {
     console.log("launching server in production");
-    let SSL_OPTS: TlsOptions = {
-      key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
-      cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
-      secureOptions: constants.SSL_OP_NO_SSLv3,
-      // ca: [fs.readFileSync("chain.pem")],
-    };
-    if (SSL_CA) {
-      SSL_OPTS.ca = [fs.readFileSync(SSL_CA)];
-    }
-    return await https
-      .createServer(SSL_OPTS, app)
-      .listen(SERVER_PORT, SERVER_HOST, null, null);
-  } else if (NODE_ENV === "development") {
-    console.log("launching server in development");
-    return await server.listen(SERVER_PORT, SERVER_HOST);
+    return await server.listen(SERVER_PORT, SERVER_HOST, null, null);
   } else {
-    console.log("launching server in test mode");
+    console.log("launching server in development");
     return await app.listen(SERVER_PORT, SERVER_HOST);
   }
 }
