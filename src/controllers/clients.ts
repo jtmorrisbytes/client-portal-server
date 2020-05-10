@@ -2,7 +2,7 @@
 
 import { Request, Response } from "express";
 
-export function register(req: Request, res: Response) {
+export async function register(req: Request, res: Response) {
   try {
     const {
       firstName,
@@ -15,6 +15,10 @@ export function register(req: Request, res: Response) {
       zip,
       lastName,
     } = req.body || {};
+
+    // grab database reference from app
+
+    const db = req.app.get("db");
     // check client by username || email address first
   } catch (e) {
     res.status(500).json({});
