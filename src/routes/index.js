@@ -22,10 +22,10 @@ const { REACT_APP_CLIENT_ID } = process.env;
 // verify client id
 
 // routes.use(enforceClientIdExists);
-routes.post(auth.basePath + "/logout", auth.controller.logOut);
+routes.use(user.basePath, enforceUserLoggedIn, user.router);
 routes.use(auth.basePath, auth.router);
-routes.use(enforceUserLoggedIn);
-routes.use(user.basePath, user.router);
+routes.post(auth.basePath + "/logout", auth.controller.logOut);
+
 // finalize the request
 
 module.exports = { router: routes, rootPath };

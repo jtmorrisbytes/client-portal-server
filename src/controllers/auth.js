@@ -165,10 +165,6 @@ async function getSession(req, res) {
   }
 }
 async function logIn(req, res) {
-  con.log(
-    "/api/auth/login: login requested user object",
-    req.body.user || "NOT FOUND"
-  );
   try {
     let errors = [];
     let email = req.body.email;
@@ -192,6 +188,7 @@ async function logIn(req, res) {
     let result = await req.app.get("db").user.getByEmail(email);
     if (result.length === 0) {
       res.status(401).json(USER.ENotFoundByEmail);
+      return;
     } else {
       let user = result[0];
       con.log("/api/auth/login user found, comparing hash");
@@ -204,9 +201,11 @@ async function logIn(req, res) {
           id: user.users_id,
         }),
           res.json({ ...req.session.user });
+        return;
       } else {
         con.warn("/api/auth/login recieved an invalid password");
         res.status(PASSWORD.ENotAuthorized.CODE).json(PASSWORD.ENotAuthorized);
+        return;
       }
     }
   } catch (e) {

@@ -5,6 +5,7 @@ async function getUser(req, res) {
       let result = await db.user.getLoggedIn(req.session.user.id);
       let user = result[0];
       res.json(user || {});
+      return;
     } catch (e) {
       console.log(e);
       res.status(500).json({});
