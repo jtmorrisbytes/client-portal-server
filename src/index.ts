@@ -12,7 +12,7 @@ import * as massive from "massive";
 import type { TlsOptions } from "tls";
 import * as https from "https";
 import * as constants from "constants";
-import * as ws from "express-ws";
+// import * as ws from "express-ws";
 
 let NODE_ENV: string = process.env.NODE_ENV || "";
 let SSL_CERT: string = process.env.SSL_CERT || "";
@@ -36,7 +36,7 @@ if (SSL_CA) {
 }
 
 let server = https.createServer(SSL_OPTS, app);
-const wsinstance = ws(app, server);
+// const wsinstance = ws(app, server);
 
 app.use(require("./configureHelmet"));
 // express-session

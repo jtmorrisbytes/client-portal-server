@@ -7,7 +7,7 @@ select
  city,
  state,
  zip
- from clients
+ from client
 where 
  first_name   ILIKE $1 OR 
  last_name    ILIKE $1 OR 

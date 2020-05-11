@@ -32,3 +32,16 @@ export function login(req: Request, res: Response<{ id: string } | {}>) {
 export function update(req: Request, res: Response) {
   res.status(501).json({});
 }
+export async function search(req: Request, res: Response) {
+  try {
+    res
+      .status(200)
+      .json(
+        (await req.app.get("db")?.client?.searchC(`%${req.query.q || ""}%`)) ||
+          []
+      );
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e, data: [] });
+  }
+}
