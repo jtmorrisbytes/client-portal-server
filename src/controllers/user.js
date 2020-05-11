@@ -13,4 +13,11 @@ async function getUser(req, res) {
   }
   res.json({ user: null });
 }
-module.exports = { getUser };
+async function getClients(req, res) {
+  try {
+    res.json((await req.app.get("db").user.getClients()) || []);
+  } catch (e) {
+    res.status(500).json([]);
+  }
+}
+module.exports = { getUser, getClients };
