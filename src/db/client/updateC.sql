@@ -6,7 +6,7 @@ update client set
   street_address = $6,
   city = $7,
   state= $8,
-  zip= $9)
+  zip= $9
 where client_id = $1
 RETURNING 
  client_id,

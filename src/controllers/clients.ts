@@ -113,7 +113,20 @@ export async function update(req: Request, res: Response) {
     state,
     zip,
   } = req.body || {};
-  if (email == null) {
+  if (clientId == null) {
+    res.status(400).json({
+      MESSAGE: "Field client.clientId was missing from the request",
+      TYPE: "CLIENT_ID_MISSING",
+    });
+  } else if (String(+clientId) === "NaN") {
+    res.status(400).json({
+      MESSAGE:
+        "Expected field client.clientId to be a number, but recieved '" +
+        typeof clientId +
+        "'",
+      TYPE: "CLIENT_ID_INVALID",
+    });
+  } else if (email == null) {
     res.status(EMAIL.EMissing.CODE).json(EMAIL.EMissing);
   } else if (!EMAIL.Email(email).isValid) {
     res.status(EMAIL.EInvalid.CODE).json(EMAIL.EInvalid);
