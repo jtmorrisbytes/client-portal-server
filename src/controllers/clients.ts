@@ -68,14 +68,28 @@ export async function register(req: Request, res: Response) {
     // check client by username || email address first
   } catch (e) {
     console.error(e);
-
-    if (e.code === "23502") {
-      console.error("constraint violation");
-      res.status(400).json({
-        MESSAGE: `Field ${e.column} violated null constraint`,
-        TYPE: "VIOLATED_NULL_CONSTRAINT",
-        field: e.column,
-      });
+    if (e.code) {
+      switch (e.code) {
+        case "23502":
+          console.error("constraint violation");
+          res.status(400).json({
+            MESSAGE: `Field ${e.column} violated null constraint`,
+            TYPE: "VIOLATED_NULL_CONSTRAINT",
+            field: e.column,
+          });
+          break;
+        case "23505":
+          let match = /\(([a-zA-Z]+)\)=\(([a-zA-Z0-9.@\!#$%^&*\(\)\_\-\=]+)\)/.exec(
+            e.detail
+          );
+          console.error("UNIQUE CONSTRAINT VIOLATION");
+          res.status(400).json({
+            MESSAGE: "That $field already exists",
+            TYPE: "VIOLATED_UNIQUE_CONSTRAINT",
+            field: match[1] || null,
+            value: match[2] || null,
+          });
+      }
     } else {
       res.status(500).json({ error: e, data: [] });
     }
