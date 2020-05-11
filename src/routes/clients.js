@@ -13,6 +13,8 @@ const controller = require("../controllers/clients.ts");
 //     }
 //   });
 // });
-router.use(controller.search);
-
+router.get("/search", controller.search);
+router.post("/", controller.register);
+router.put("/", controller.update);
+router.delete("/", controller.deleteC);
 module.exports = { basePath, router };
