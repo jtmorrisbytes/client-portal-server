@@ -225,14 +225,13 @@ export async function search(req: Request, res: Response) {
   }
 }
 export async function deleteC(req: Request, res: Response) {
-  if (String(+req.query?.client_id) === "NaN" && +req.query?.client_id > 0) {
+  console.log("delete client requested for " + req.body.clientId);
+  if (+req.body?.clientId > 0) {
     try {
-      let deleteResult = await req.app.get("db")?.client?.deleteC();
-      if (deleteResult.length === 0) {
-        res.status(204).send();
-      } else {
-        res.status(500).send();
-      }
+      let deleteResult = await req.app
+        .get("db")
+        ?.client?.deleteC(req.body.clientId);
+      res.status(204).send();
     } catch (e) {
       console.error(e);
       res.status(500).json({ error: e });
