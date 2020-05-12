@@ -12,7 +12,27 @@ let ENameInvalid = {
   value: "",
   CODE: 400,
 };
+function convertSnakeToCamel(obj) {
+  let newO = {};
+  for (let key in obj) {
+    let newKey = key.slice();
+    console.log("old key:", key);
+    let index = newKey.indexOf("_");
+    while (index > 0) {
+      console.log("index", index);
+      newKey =
+        newKey.substring(0, index) +
+        newKey.substr(index + 1, 1).toUpperCase() +
+        newKey.substring(index + 2);
+      console.log("newKey progress", newKey);
 
+      index = newKey.indexOf("_");
+    }
+    newO[newKey] = obj[key];
+    console.log("newKey", newKey);
+  }
+  return newO;
+}
 export async function register(req: Request, res: Response) {
   try {
     const {
@@ -99,7 +119,7 @@ export async function register(req: Request, res: Response) {
           value: e.hint || null,
         });
       default:
-        res.status(500).json({ error: e, data: [] });
+        res.status(500).json({ error: e, data: {} });
     }
   }
 }
@@ -171,7 +191,7 @@ export async function update(req: Request, res: Response) {
         zip
       );
     if (updateResult.length > 0) {
-      res.status(200).json(updateResult[0]);
+      res.status(200).json(convertSnakeToCamel(updateResult[0]));
     } else {
       res.status(500).send();
     }
@@ -192,12 +212,13 @@ export async function update(req: Request, res: Response) {
 }
 export async function search(req: Request, res: Response) {
   try {
-    res
-      .status(200)
-      .json(
-        (await req.app.get("db")?.client?.searchC(`%${req.query.q || ""}%`)) ||
-          []
-      );
+    let searchResult = await req.app
+      .get("db")
+      ?.client?.searchC(`%${req.query.q || ""}%`);
+    searchResult = searchResult.map((entry: object) => {
+      return convertSnakeToCamel(entry);
+    });
+    res.status(200).json(searchResult);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: e, data: [] });

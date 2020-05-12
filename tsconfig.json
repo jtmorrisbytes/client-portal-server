@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "lib": ["ESNext"],
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "module": "commonJS",
     "moduleResolution": "node",
     "target": "es6",
