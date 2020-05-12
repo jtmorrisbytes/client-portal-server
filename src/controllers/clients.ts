@@ -60,7 +60,17 @@ export async function register(req: Request, res: Response) {
           zip
         );
       if (createResult.length > 0) {
-        res.status(201).json(createResult[0]);
+        let user = createResult[0];
+        res.status(201).json({
+          clientId: user.client_id,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          phoneNumber: user.phone_number,
+          email: user.email,
+          city: user.city,
+          state: user.state,
+          zip: user.zip,
+        });
       } else {
         res.status(500).json({});
       }
