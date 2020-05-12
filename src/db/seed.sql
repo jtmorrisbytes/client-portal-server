@@ -36,4 +36,10 @@ create table users_client (
   client_id int references client(client_id)
 );
 
-insert into users(email, email_verified, hash) values('jthecybertinkerer@gmail.com', false, 'the hash');
+insert into users(email, email_verified, hash) 
+  values('jthecybertinkerer@gmail.com', false, 'the hash');
+insert into client(first_name, email) 
+  values('jordan','thisisatest@gmail.com');
+insert into users_client (client_id, users_id) 
+ values((select client_id from client where email = 'thisisatest@gmail.com'),
+        (select users_id from users where email = 'jthecybertinkerer@gmail.com'))
