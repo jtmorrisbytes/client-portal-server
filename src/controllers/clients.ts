@@ -122,57 +122,61 @@ export async function update(req: Request, res: Response) {
         "'",
       TYPE: "CLIENT_ID_INVALID",
     });
-  } else if (email == null) {
+  }
+  if (email == null) {
     res.status(EMAIL.EMissing.CODE).json(EMAIL.EMissing);
   } else if (!EMAIL.Email(email).isValid) {
     res.status(EMAIL.EInvalid.CODE).json(EMAIL.EInvalid);
-  } else if (!new NAME.Name(firstName).isValid && firstName) {
+  }
+  if (!new NAME.Name(firstName).isValid && firstName) {
     res.status(ENameInvalid.CODE).json({
       MESSAGE: "field firstName was not a valid Name",
       TYPE: "NAME_INVALID",
       field: "firstName",
       value: firstName,
     });
-  } else if (!new NAME.Name(lastName).isValid && lastName) {
+    return;
+  }
+  if (!new NAME.Name(lastName).isValid && lastName) {
     res.status(ENameInvalid.CODE).json({
       MESSAGE: "field lastName was not a valid Name",
       TYPE: "NAME_INVALID",
       field: "lastName",
       value: lastName,
     });
-  } else {
-    try {
-      let updateResult = await req.app
-        .get("db")
-        .client.updateC(
-          clientId,
-          firstName,
-          lastName,
-          email,
-          phoneNumber,
-          streetAddress,
-          city,
-          state,
-          zip
-        );
-      if (updateResult.length > 0) {
-        res.status(200).json(updateResult[0]);
-      } else {
-        res.status(500).send();
-      }
-    } catch (e) {
-      console.error("client.update route handler:", e);
-      switch (+e.code) {
-        case 23505:
-          res.status(400).json({
-            ...EMAIL.ENotAuthorized,
-            REASON: "Emails must be unique between clients",
-            CODE: 400,
-          });
-          break;
-        default:
-          res.status(500).json({ error: e, data: {} });
-      }
+    return;
+  }
+  try {
+    let updateResult = await req.app
+      .get("db")
+      .client.updateC(
+        clientId,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        streetAddress,
+        city,
+        state,
+        zip
+      );
+    if (updateResult.length > 0) {
+      res.status(200).json(updateResult[0]);
+    } else {
+      res.status(500).send();
+    }
+  } catch (e) {
+    console.error("client.update route handler:", e);
+    switch (+e.code) {
+      case 23505:
+        res.status(400).json({
+          ...EMAIL.ENotAuthorized,
+          REASON: "Emails must be unique between clients",
+          CODE: 400,
+        });
+        break;
+      default:
+        res.status(500).json({ error: e, data: {} });
     }
   }
 }
