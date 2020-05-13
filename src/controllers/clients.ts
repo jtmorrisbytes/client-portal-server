@@ -3,7 +3,7 @@
 import { Request, Response } from "express";
 import * as EMAIL from "@jtmorrisbytes/lib/Email";
 import * as NAME from "@jtmorrisbytes/lib/Name";
-
+import { convertSnakeToCamel } from "../lib/convertSnakeToCamel";
 // TODO: move this over to the library
 let ENameInvalid = {
   MESSAGE: "field BLANK was not a valid Name",
@@ -12,27 +12,6 @@ let ENameInvalid = {
   value: "",
   CODE: 400,
 };
-function convertSnakeToCamel(obj) {
-  let newO = {};
-  for (let key in obj) {
-    let newKey = key.slice();
-    console.log("old key:", key);
-    let index = newKey.indexOf("_");
-    while (index > 0) {
-      console.log("index", index);
-      newKey =
-        newKey.substring(0, index) +
-        newKey.substr(index + 1, 1).toUpperCase() +
-        newKey.substring(index + 2);
-      console.log("newKey progress", newKey);
-
-      index = newKey.indexOf("_");
-    }
-    newO[newKey] = obj[key];
-    console.log("newKey", newKey);
-  }
-  return newO;
-}
 export async function register(req: Request, res: Response) {
   try {
     const {
@@ -72,7 +51,7 @@ export async function register(req: Request, res: Response) {
         .client.createC(
           firstName,
           lastName,
-          email,
+          String(email).toLowerCase(),
           phoneNumber,
           streetAddress,
           city,
@@ -81,16 +60,7 @@ export async function register(req: Request, res: Response) {
         );
       if (createResult.length > 0) {
         let user = createResult[0];
-        res.status(201).json({
-          clientId: user.client_id,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          phoneNumber: user.phone_number,
-          email: user.email,
-          city: user.city,
-          state: user.state,
-          zip: user.zip,
-        });
+        res.status(201).json(convertSnakeToCamel(user));
       } else {
         res.status(500).json({});
       }

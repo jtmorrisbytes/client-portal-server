@@ -2,12 +2,12 @@ do $update_client$
 declare
  new_first_name text:= (select coalesce($2,(select first_name from client where client_id = $1),''));
  new_last_name text:= (select coalesce($3,(select last_name from client where client_id = $1),''));
- new_email text:= (select coalesce($4, (select email from client where client_id = $1)));
+ new_email text:= (select lower(coalesce($4, (select email from client where client_id = $1))));
  new_phone_number text := (select coalesce($5,(select phone_number from client where client_id = $1),''));
  new_street_address text := (select coalesce($6, (select street_address from client where client_id = $1),''));
  new_city text := (select coalesce($7,(select city from client where client_id = $1),''));
  new_state text := (select coalesce($8, (select state from client where client_id = $1),''));
- new_zip text := (select coalesce($9,(select zip from client where client_id = $1),''));
+ new_zip text := (select coalesce(cast ($9 as text),(select zip from client where client_id = $1),''));
 begin
   if exists(select client_id from client where client_id = $1) then
     raise notice 'the client exists';
