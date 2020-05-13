@@ -34,9 +34,15 @@ async function getClients(req, res) {
 }
 async function addClient(req, res) {
   try {
+    console.log("Adding client to user", req.body);
     //if the database function does not throw an error, the operation
     //is considered to be successful
-    await req.app.get("db").user.addClient(req.body.userId, req.body.clientId);
+    await req.app
+      .get("db")
+      .user.addClient(
+        req.session.user.id || req.body.userId,
+        req.body.clientId
+      );
     res.status(204).send();
   } catch (e) {
     switch (e.code) {
