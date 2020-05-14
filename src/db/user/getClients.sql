@@ -1,10 +1,10 @@
 SELECT
- cl.client_id,
- cl.first_name,
- cl.last_name,
+ cl.client_id as id,
+ cl.first_name as "firstName",
+ cl.last_name as "lastName",
  cl.email,
- cl.phone_number,
- cl.street_address,
+ cl.phone_number as "phoneNumber",
+ cl.street_address as "streetAddress",
  cl.city,
  cl.state,
  cl.zip 
