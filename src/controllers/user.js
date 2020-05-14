@@ -20,11 +20,9 @@ async function getUser(req, res) {
 async function getClients(req, res) {
   try {
     res.json(
-      snakeArrToCamelArr(
-        await req.app
-          .get("db")
-          .user.getClients(req.session.user.id || req.body.userId)
-      )
+      await req.app
+        .get("db")
+        .user.getClients(req.session.user.id || req.body.userId)
     );
   } catch (e) {
     console.error(e);
