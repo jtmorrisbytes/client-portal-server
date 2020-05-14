@@ -8,8 +8,7 @@ async function getUser(req, res) {
     const db = req.app.get("db");
     try {
       let result = await db.user.getLoggedIn(req.session.user.id);
-      let user = result[0];
-      res.json(convertSnakeToCamel(user || {}));
+      res.json(result[0]);
       return;
     } catch (e) {
       console.log(e);
