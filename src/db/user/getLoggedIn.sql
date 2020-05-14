@@ -4,10 +4,10 @@
 -- the need for post processing on the
 -- server
 SELECT users_id as id,
-       first_name as firstName,
-       last_name as lastName,
+       first_name as "firstName",
+       last_name as "lastName",
        email,
-       street_address as streetAddress,
+       street_address as "streetAddress",
        city, 
        state, 
        zip 
