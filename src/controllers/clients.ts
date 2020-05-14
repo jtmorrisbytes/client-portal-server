@@ -213,3 +213,12 @@ export async function deleteC(req: Request, res: Response) {
     });
   }
 }
+export async function getById(req: Request, res: Response) {
+  try {
+    let client = await req.app.get("db").client.findById(req.params.id || 0);
+    res.status(200).json(client || null);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e });
+  }
+}

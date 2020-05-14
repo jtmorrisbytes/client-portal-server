@@ -14,6 +14,7 @@ const controller = require("../controllers/clients.ts");
 //   });
 // });
 router.get("/search", controller.search);
+router.get("/:id", controller.getById);
 router.post("/", controller.register);
 router.put("/", controller.update);
 router.delete("/", controller.deleteC);
