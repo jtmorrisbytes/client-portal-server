@@ -9,7 +9,7 @@ async function getUser(req, res) {
     try {
       let result = await db.user.getLoggedIn(req.session.user.id);
       let user = result[0];
-      res.json(user || {});
+      res.json(convertSnakeToCamel(user || {}));
       return;
     } catch (e) {
       console.log(e);
