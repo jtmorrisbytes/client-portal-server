@@ -37,7 +37,8 @@ begin
     raise exception 'Client id % does not exist', 1;
   end if;
 end $update_client$;
-select client_id, first_name,
+select client_id
+      first_name,
       last_name,
       email ,
       phone_number ,

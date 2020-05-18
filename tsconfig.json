@@ -10,5 +10,5 @@
     "allowJs": true,
     "sourceMap": true
   },
-  "include": ["src"]
+  "include": ["src", "dist/convertSnakeToCamel.js"]
 }

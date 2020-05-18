@@ -17,5 +17,5 @@ router.get("/search", controller.search);
 router.get("/:id", controller.getById);
 router.post("/", controller.register);
 router.put("/", controller.update);
-router.delete("/", controller.deleteC);
+router.delete("/:id", controller.deleteC);
 module.exports = { basePath, router };

@@ -25,17 +25,6 @@ let SERVER_HOST: string = process.env.SERVER_HOST || "127.0.0.1";
 console.log("CWD", process.cwd() || "no CWD");
 const app = express();
 
-let SSL_OPTS: TlsOptions = {
-  key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
-  cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
-  secureOptions: constants.SSL_OP_NO_SSLv3,
-  // ca: [fs.readFileSync("chain.pem")],
-};
-if (SSL_CA) {
-  SSL_OPTS.ca = [fs.readFileSync(SSL_CA)];
-}
-
-let server = https.createServer(SSL_OPTS, app);
 // const wsinstance = ws(app, server);
 
 app.use(require("./configureHelmet"));
@@ -49,17 +38,14 @@ let sessionConfig: session.SessionOptions = {
   secret: SESSION_SECRET,
   resave: true,
   saveUninitialized: false,
-  proxy: true,
+  proxy: NODE_ENV === "production",
+  rolling: true,
   cookie: {
     maxAge: 1000 * 60 * 5,
-    secure: process.env.NODE_ENV === "production",
+    secure: NODE_ENV === "production",
   },
 };
 app.use(express.static(path.join(process.cwd(), "build")));
-
-if (NODE_ENV === "production") {
-  sessionConfig.cookie.secure = true;
-}
 app.use(session(sessionConfig));
 
 app.use(express.json());
@@ -80,6 +66,17 @@ export async function main(db?: any) {
   }
   app.set("db", db);
   if (NODE_ENV === "production") {
+    let SSL_OPTS: TlsOptions = {
+      key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
+      cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
+      secureOptions: constants.SSL_OP_NO_SSLv3,
+      // ca: [fs.readFileSync("chain.pem")],
+    };
+    if (SSL_CA) {
+      SSL_OPTS.ca = [fs.readFileSync(SSL_CA)];
+    }
+
+    let server = https.createServer(SSL_OPTS, app);
     console.log("launching server in production");
     return await server.listen(SERVER_PORT, SERVER_HOST, null, null);
   } else {

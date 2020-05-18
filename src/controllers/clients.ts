@@ -3,7 +3,7 @@
 import { Request, Response } from "express";
 import * as EMAIL from "@jtmorrisbytes/lib/Email";
 import * as NAME from "@jtmorrisbytes/lib/Name";
-import { convertSnakeToCamel } from "../lib/convertSnakeToCamel";
+import { convertSnakeToCamel } from "../../dist/convertSnakeToCamel";
 // TODO: move this over to the library
 let ENameInvalid = {
   MESSAGE: "field BLANK was not a valid Name",
@@ -97,6 +97,8 @@ export function login(req: Request, res: Response) {
   res.status(501).json({});
 }
 export async function update(req: Request, res: Response) {
+  console.log("ClientUpdate request body", req.body);
+  console.log;
   let {
     clientId,
     firstName,
@@ -109,6 +111,7 @@ export async function update(req: Request, res: Response) {
     state,
     zip,
   } = req.body || {};
+  clientId = clientId || req.params.clientId;
   if (clientId == null) {
     res.status(400).json({
       MESSAGE: "Field client.clientId was missing from the request",
@@ -195,12 +198,12 @@ export async function search(req: Request, res: Response) {
   }
 }
 export async function deleteC(req: Request, res: Response) {
-  console.log("delete client requested for " + req.body.clientId);
-  if (+req.body?.clientId > 0) {
+  console.log("delete client requested for " + req.params.clientId);
+  if (+(req.body?.clientId || req.params?.id) > 0) {
     try {
       let deleteResult = await req.app
         .get("db")
-        ?.client?.deleteC(req.body.clientId);
+        ?.client?.deleteC(req.body?.clientId || req.params?.id);
       res.status(204).send();
     } catch (e) {
       console.error(e);

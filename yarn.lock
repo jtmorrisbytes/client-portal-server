@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@jtmorrisbytes/lib@0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@jtmorrisbytes/lib/-/lib-0.0.28.tgz#a84a59c0481c15b99a533c76061aaed9ddab744e"
+  integrity sha512-bPoM5TXjCgmFSeE8sD3cz+TLDSmxClkRdxHyq4ZNwIVP0CRUuTHaGMj72TgFyTVzV++ObGR/PotOLbBp2kRgOQ==
+
 "@types/body-parser@*":
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.0.tgz#0685b3c47eb3006ffed117cdd55164b61f80538f"
