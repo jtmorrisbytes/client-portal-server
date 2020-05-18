@@ -1,4 +1,6 @@
 const fs = require("fs");
+const path = require("path");
+const CWD = process.CWD();
 let {
   DATABASE_USERNAME,
   DATABASE_PASSWORD,
@@ -28,7 +30,7 @@ if (NODE_ENV === "production") {
   config.ssl = {
     mode: "require",
     // rejectUnauthorized: false,
-    ca: fs.readFileSync("db.ca-certificate.crt"),
+    ca: fs.readFileSync(path.join(CWD, "db.ca-certificate.crt")),
   };
 } else if (NODE_ENV === "development") {
   console.log(" for development\n");

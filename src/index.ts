@@ -22,7 +22,8 @@ let SESSION_SECRET = process.env.SESSION_SECRET || "";
 let SERVER_PORT: number = Number(process.env.SERVER_PORT) || 3000;
 let SERVER_HOST: string = process.env.SERVER_HOST || "127.0.0.1";
 //normalize variables
-console.log("CWD", process.cwd() || "no CWD");
+let CWD = process.cwd();
+console.log("CWD", CWD || "no CWD");
 const app = express();
 
 // const wsinstance = ws(app, server);
@@ -45,7 +46,7 @@ let sessionConfig: session.SessionOptions = {
     secure: NODE_ENV === "production",
   },
 };
-app.use(express.static(path.join(process.cwd(), "build")));
+app.use(express.static(path.join(CWD, "build")));
 app.use(session(sessionConfig));
 
 app.use(express.json());
@@ -67,8 +68,12 @@ export async function main(db?: any) {
   app.set("db", db);
   if (NODE_ENV === "production") {
     let SSL_OPTS: TlsOptions = {
-      key: fs.readFileSync(path.resolve(SSL_KEY || "privkey.pem")),
-      cert: fs.readFileSync(path.resolve(SSL_CERT || "fullchain.pem")),
+      key: fs.readFileSync(
+        path.resolve(SSL_KEY || path.join(CWD, "privkey.pem"))
+      ),
+      cert: fs.readFileSync(
+        path.resolve(SSL_CERT || path.join(CWD, "fullchain.pem"))
+      ),
       secureOptions: constants.SSL_OP_NO_SSLv3,
       // ca: [fs.readFileSync("chain.pem")],
     };
