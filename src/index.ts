@@ -74,7 +74,7 @@ export async function main(db?: any) {
       cert: fs.readFileSync(
         path.resolve(SSL_CERT || path.join(CWD, "fullchain.pem"))
       ),
-      secureOptions: constants.SSL_OP_NO_SSLv3,
+      // secureOptions: constants.SSL_OP_NO_SSLv3,
       // ca: [fs.readFileSync("chain.pem")],
     };
     if (SSL_CA) {
