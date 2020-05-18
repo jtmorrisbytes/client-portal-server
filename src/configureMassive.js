@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const CWD = process.CWD();
+const CWD = process.cwd();
 let {
   DATABASE_USERNAME,
   DATABASE_PASSWORD,
