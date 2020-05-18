@@ -3,7 +3,7 @@
 import { Request, Response } from "express";
 import * as EMAIL from "@jtmorrisbytes/lib/Email";
 import * as NAME from "@jtmorrisbytes/lib/Name";
-import { convertSnakeToCamel } from "../../dist/convertSnakeToCamel";
+import { convertSnakeToCamel } from "../lib/convertSnakeToCamel";
 // TODO: move this over to the library
 let ENameInvalid = {
   MESSAGE: "field BLANK was not a valid Name",

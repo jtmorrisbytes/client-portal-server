@@ -1,7 +1,7 @@
 const {
   convertSnakeToCamel,
   snakeArrToCamelArr,
-} = require("../../dist/convertSnakeToCamel");
+} = require("../lib/convertSnakeToCamel");
 
 async function getUser(req, res) {
   if ((req.session.user || {}).id) {
