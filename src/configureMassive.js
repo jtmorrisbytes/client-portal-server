@@ -25,15 +25,13 @@ let config = {
 
 console.log(`configureMassive: NODE_ENV is ${NODE_ENV}, config is`, config);
 console.log(`Configuring massive `);
-if (NODE_ENV === "production") {
+if (NODE_ENV === "production" || NODE_ENV === "development") {
   console.log("for production\r\n");
   config.ssl = {
     mode: "require",
     // rejectUnauthorized: false,
     ca: fs.readFileSync(path.join(CWD, "db.ca-certificate.crt")),
   };
-} else if (NODE_ENV === "development") {
-  console.log(" for development\n");
 } else {
   console.log("for testing ");
   if (!CI) {
