@@ -8,6 +8,7 @@ module.exports = require("helmet")({
         "'self'",
         "https://stackpath.bootstrapcdn.com/",
         "https://www.aspiesolutions.com/",
+        "http://www.aspiesolutions.com/",
         "http://localhost:3000/",
       ],
     },
@@ -23,4 +24,5 @@ module.exports = require("helmet")({
       documentDomain: ["'self'"],
     },
   },
+  hsts: false,
 });
