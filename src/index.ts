@@ -9,9 +9,9 @@ import * as massive from "massive";
 // import * as cookieparser from "cookie-parser";
 // import * as helmet from "helmet";
 // import * as http from "http";
-import type { TlsOptions } from "tls";
-import * as https from "https";
-import * as constants from "constants";
+// import type { TlsOptions } from "tls";
+// import * as https from "https";
+// import * as constants from "constants";
 // import * as ws from "express-ws";
 
 let NODE_ENV: string = process.env.NODE_ENV || "";
@@ -66,28 +66,8 @@ export async function main(db?: any) {
     db = await massive(MASSIVE_CONFIG);
   }
   app.set("db", db);
-  if (NODE_ENV === "production") {
-    let SSL_OPTS: TlsOptions = {
-      key: fs.readFileSync(
-        path.resolve(SSL_KEY || path.join(CWD, "privkey.pem"))
-      ),
-      cert: fs.readFileSync(
-        path.resolve(SSL_CERT || path.join(CWD, "fullchain.pem"))
-      ),
-      secureOptions: constants.SSL_OP_NO_SSLv3,
-      ca: [fs.readFileSync(SSL_CA || path.join(CWD, "chain.pem"))],
-    };
-    if (SSL_CA) {
-      SSL_OPTS.ca = [fs.readFileSync(SSL_CA)];
-    }
-
-    let server = https.createServer(SSL_OPTS, app);
-    console.log("launching server in production");
-    return await server.listen(SERVER_PORT, SERVER_HOST, null, null);
-  } else {
-    console.log("launching server in development");
-    return await app.listen(SERVER_PORT, SERVER_HOST);
-  }
+  console.log("launching server in development");
+  return await app.listen(SERVER_PORT, SERVER_HOST);
 }
 
 if (NODE_ENV === "production" || NODE_ENV === "development") {
