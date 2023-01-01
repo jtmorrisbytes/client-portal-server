@@ -19,13 +19,13 @@
     "@jtmorrisbytes/lib": "0.0.28",
     "jasmine": "^3.5.0",
     "supertest": "^4.0.2",
-    "ts-loader": "^7.0.1",
+    "ts-loader": "^9.4.2",
     "typescript": "^3.8.3",
-    "webpack": "^4.43.0"
+    "webpack": "^5.75.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",
-    "webpack-cli": "^3.3.11",
+    "webpack-cli": "^5.0.1",
     "webpack-node-externals": "^1.7.2"
   }
 }
